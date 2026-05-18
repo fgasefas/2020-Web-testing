@@ -1476,6 +1476,67 @@
       border-bottom-color: rgba(255, 255, 255, 0.8);
     }
 
+    .skills-section {
+      background: transparent;
+      min-height: 180vh;
+      padding-top: 0px;
+    }
+
+    .skills-section .section-inner {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+
+    .skills-template {
+      width: min(980px, 100%);
+      text-align: center;
+      margin: 0 auto;
+      padding: 56px 48px;
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(200, 164, 93, 0.12), transparent 36%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+      backdrop-filter: blur(20px) saturate(130%);
+      -webkit-backdrop-filter: blur(20px) saturate(130%);
+      box-shadow: 0 34px 96px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .skill-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(18px) saturate(130%);
+      -webkit-backdrop-filter: blur(18px) saturate(130%);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.78);
+      font-size: clamp(13px, 1.15vw, 16px);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateY(28px) scale(0.96);
+      filter: blur(10px);
+      will-change: transform, opacity, filter;
+      transition: none;
+    }
+
+
+
     .reveal {
       opacity: 0;
       transform: translateY(48px);
@@ -1606,6 +1667,7 @@
       <a href="#slogan" data-section="slogan">Slogan</a>
       <a href="#statement" data-section="statement">Statement</a>
       <a href="#case-study" data-section="case-study">Case-study</a>
+      <a href="#skills" data-section="skills">My skill</a>
       <a href="#contact" data-section="contact">Contact</a>
     </div>
     <div class="nav-progress" aria-hidden="true">
@@ -1692,6 +1754,30 @@
               </div>
             </div>
           </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="section skills-section" id="skills">
+    <div class="section-inner">
+      <div class="section-motion-content skills-template">
+        <div class="eyebrow">My skill</div>
+        <h2>Skills</h2>
+        <div class="skills-grid" aria-label="Skills list">
+          <span class="skill-pill">Fusion 360</span>
+          <span class="skill-pill">Blender</span>
+          <span class="skill-pill">Rhino</span>
+          <span class="skill-pill">Adobe Illustrator</span>
+          <span class="skill-pill">Photoshop</span>
+          <span class="skill-pill">Figma</span>
+          <span class="skill-pill">Laser cutting</span>
+          <span class="skill-pill">3D printing</span>
+          <span class="skill-pill">Vacuum forming</span>
+          <span class="skill-pill">HTML</span>
+          <span class="skill-pill">JavaScript</span>
+          <span class="skill-pill">CSS</span>
         </div>
       </div>
     </div>
@@ -1900,6 +1986,80 @@
     const cardsSection = document.querySelector('.cards-section');
     const navProgressFill = document.querySelector('#navProgressFill');
     const navLinks = document.querySelectorAll('.nav-links a[data-section]');
+    const skillsSection = document.querySelector('#skills');
+    const skillsTemplate = document.querySelector('.skills-template');
+    const skillPills = document.querySelectorAll('.skill-pill');
+    let displayedSkillsProgress = 0;
+    let targetSkillsProgress = 0;
+    let skillsAnimationFrame = null;
+    function renderSkillsPresentation() {
+      if (!skillsSection || !skillsTemplate || !skillPills.length) {
+        skillsAnimationFrame = null;
+        return;
+      }
+
+      const skillProgressDelta = targetSkillsProgress - displayedSkillsProgress;
+      const skillEaseAmount = 0.028 + Math.min(Math.abs(skillProgressDelta) * 0.18, 0.052);
+      displayedSkillsProgress += skillProgressDelta * skillEaseAmount;
+      const progress = displayedSkillsProgress;
+
+      renderSkillsPresentationFrame(progress);
+
+      if (Math.abs(targetSkillsProgress - displayedSkillsProgress) > 0.00008) {
+        skillsAnimationFrame = requestAnimationFrame(renderSkillsPresentation);
+      } else {
+        displayedSkillsProgress = targetSkillsProgress;
+        renderSkillsPresentationFrame(displayedSkillsProgress);
+        skillsAnimationFrame = null;
+      }
+    }
+
+    function renderSkillsPresentationFrame(progress) {
+      const introProgress = smootherstep(progress / 0.18);
+      skillsTemplate.style.opacity = `${0.72 + introProgress * 0.28}`;
+      skillsTemplate.style.transform = `translateY(${46 * (1 - introProgress)}px) scale(${0.955 + introProgress * 0.045})`;
+
+      skillPills.forEach((pill, index) => {
+        const stepStart = 0.12 + index * 0.045;
+        const stepEnd = stepStart + 0.12;
+        const stepProgress = smootherstep((progress - stepStart) / (stepEnd - stepStart));
+        const y = 58 * (1 - stepProgress);
+        const scale = 0.94 + stepProgress * 0.06;
+        const blur = 12 * (1 - stepProgress);
+
+        pill.style.opacity = `${stepProgress}`;
+        pill.style.transform = `translateY(${y}px) scale(${scale})`;
+        pill.style.filter = `blur(${blur}px)`;
+      });
+    }
+
+    function updateSkillsPresentation() {
+      if (!skillsSection || !skillsTemplate || !skillPills.length) return;
+
+      const rect = skillsSection.getBoundingClientRect();
+      const total = Math.max(1, skillsSection.offsetHeight - window.innerHeight);
+      const rawProgress = clamp(-rect.top / total, 0, 1);
+      const isNearSkills = rect.top < window.innerHeight && rect.bottom > 0;
+
+      if (!isNearSkills) {
+        targetSkillsProgress = 0;
+        displayedSkillsProgress = 0;
+        skillsTemplate.style.opacity = '0.72';
+        skillsTemplate.style.transform = 'translateY(28px) scale(0.975)';
+        skillPills.forEach((pill) => {
+          pill.style.opacity = '0';
+          pill.style.transform = 'translateY(28px) scale(0.96)';
+          pill.style.filter = 'blur(10px)';
+        });
+        return;
+      }
+
+      targetSkillsProgress = rawProgress;
+
+      if (!skillsAnimationFrame) {
+        skillsAnimationFrame = requestAnimationFrame(renderSkillsPresentation);
+      }
+    }
 
     function getPageById(id) {
       if (id === 'intro') {
@@ -1931,7 +2091,7 @@
       return section ? {
         id: section.id,
         section,
-        progress: id === 'projects' ? 0 : 0.5
+        progress: id === 'skills' ? 0.75 : id === 'projects' ? 0 : 0.5
       } : null;
     }
 
@@ -1969,6 +2129,7 @@
         getPageById('statement'),
         ...getCaseStudySmallPages(),
         projectsSection ? { id: 'case-study-projects', section: projectsSection, progress: 0.5 } : null,
+        getPageById('skills'),
         getPageById('contact')
       ].filter(Boolean);
     }
@@ -2279,6 +2440,8 @@
               });
             } else if (page.id === 'contact') {
               applyHoldState({ progress: 0, visible: false });
+            } else if (page.id === 'skills') {
+              applyHoldState({ progress: 0, visible: false });
             } else {
               applyHoldState(getHoldState(rawPageProgress, 0.64, 0.9));
             }
@@ -2310,9 +2473,11 @@
         const isGallerySection = section.classList.contains('gallery-section');
         const isEndSection = section.classList.contains('end-section');
 
-        if (isProjectsSection || isEndSection) {
-          motionContent.style.transform = 'none';
-          motionContent.style.opacity = '1';
+        if (isProjectsSection || isEndSection || section.classList.contains('skills-section')) {
+          if (!section.classList.contains('skills-section')) {
+            motionContent.style.transform = 'none';
+            motionContent.style.opacity = '1';
+          }
           return;
         }
 
@@ -2371,6 +2536,7 @@
     window.addEventListener('scroll', () => {
       const scrollY = window.scrollY;
       updateSectionMotion();
+      updateSkillsPresentation();
       updateNavProgress();
 
       if (orbLayer) {
