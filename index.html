@@ -3,12 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scrolling Animation Template</title>
+  <title>Junqi's Portfolio</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    @property --badge-angle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+
+    @property --badge-pop-scale {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 1;
+    }
+
+    @property --badge-pop-x {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 1;
+    }
+
+    @property --badge-pop-y {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 1;
+    }
+
+    @property --badge-soft-stretch {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 1;
     }
 
     html {
@@ -17,17 +47,245 @@
 
     body {
       font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #050505;
+      background: #020202;
       color: white;
       overflow-x: hidden;
+      position: relative;
     }
+
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      background: linear-gradient(180deg, #020202 0%, #07110d 48%, #020202 100%);
+    }
+
+    .intro-stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      overflow: hidden;
+      mix-blend-mode: screen;
+      will-change: opacity;
+    }
+
+
+    .intro-stars.visible {
+      opacity: 0.62;
+    }
+
+    .intro-stars.visible { opacity: 0.62; }
+
+    .intro-star-particle {
+      position: absolute;
+      left: calc(var(--star-x) * 1vw);
+      top: calc(var(--star-y) * 1vh);
+      width: var(--star-size);
+      height: var(--star-size);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, var(--star-brightness));
+      box-shadow: 0 0 var(--star-glow) rgba(255, 255, 255, 0.58);
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: var(--star-opacity);
+      will-change: transform, opacity;
+      animation: starTwinkle var(--star-twinkle-duration) ease-in-out infinite alternate;
+    }
+
+    .intro-star-particle.gold {
+      background: rgba(200, 164, 93, var(--star-brightness));
+      box-shadow: 0 0 var(--star-glow) rgba(200, 164, 93, 0.62);
+    }
+
+    @keyframes starTwinkle {
+      0% {
+        opacity: calc(var(--star-opacity) * 0.28);
+        filter: brightness(0.78);
+      }
+      45% {
+        opacity: calc(var(--star-opacity) * 0.72);
+        filter: brightness(1.05);
+      }
+      100% {
+        opacity: var(--star-opacity);
+        filter: brightness(1.65);
+      }
+    }
+
+    .scroll-edge-light {
+      position: fixed;
+      left: 50%;
+      width: 138px;
+      height: 5px;
+      z-index: 900;
+      pointer-events: auto;
+      opacity: 0;
+      will-change: opacity, transform, filter;
+      transition: opacity 0.16s ease, transform 0.16s ease, filter 0.16s ease;
+      border-radius: 999px;
+      background: rgba(232, 232, 232, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px) saturate(130%);
+      -webkit-backdrop-filter: blur(14px) saturate(130%);
+      box-shadow:
+        0 0 12px rgba(255, 255, 255, 0.12),
+        0 10px 28px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      filter: blur(0.05px);
+      cursor: pointer;
+    }
+
+    .scroll-edge-light:hover {
+      background: rgba(245, 245, 245, 0.72);
+      box-shadow:
+        0 0 16px rgba(255, 255, 255, 0.18),
+        0 12px 32px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    }
+
+    .scroll-edge-light.top {
+      top: 82px;
+      transform: translateX(-50%) translateY(-10px) scaleX(0.86);
+      transform-origin: center;
+    }
+
+    .scroll-edge-light.bottom {
+      bottom: 22px;
+      transform: translateX(-50%) translateY(10px) scaleX(0.86);
+      transform-origin: center;
+    }
+
+    .orb-layer {
+      position: absolute;
+      inset: -80vh -12vw;
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+      transition: none;
+    }
+
+    .orb {
+      position: absolute;
+      left: 50%;
+      border-radius: 50%;
+      transform: translate3d(-50%, 0, 0);
+      opacity: 0.78;
+      pointer-events: none;
+      will-change: transform;
+      animation: orbSlowFloat 16s ease-in-out infinite alternate;
+    }
+
+    .orb-green {
+      width: 78vw;
+      height: 150vh;
+      background: radial-gradient(ellipse at center, rgba(92, 205, 138, 0.42), transparent 66%);
+    }
+
+    .orb-gold {
+      width: 58vw;
+      height: 120vh;
+      background: radial-gradient(ellipse at center, rgba(255, 198, 82, 0.32), transparent 66%);
+    }
+
+    .orb-blue {
+      width: 66vw;
+      height: 128vh;
+      background: radial-gradient(ellipse at center, rgba(90, 126, 245, 0.28), transparent 68%);
+    }
+
+    .orb-set-1 .orb-green { animation-duration: 18s; animation-delay: -2s; }
+    .orb-set-1 .orb-gold { animation-duration: 22s; animation-delay: -7s; }
+    .orb-set-1 .orb-blue { animation-duration: 20s; animation-delay: -11s; }
+
+    .orb-set-2 .orb-green { animation-duration: 24s; animation-delay: -5s; }
+    .orb-set-2 .orb-gold { animation-duration: 19s; animation-delay: -13s; }
+    .orb-set-2 .orb-blue { animation-duration: 26s; animation-delay: -8s; }
+
+    .orb-set-3 .orb-green { animation-duration: 21s; animation-delay: -9s; }
+    .orb-set-3 .orb-gold { animation-duration: 25s; animation-delay: -4s; }
+    .orb-set-3 .orb-blue { animation-duration: 23s; animation-delay: -15s; }
+
+    .orb-set-4 .orb-green { animation-duration: 27s; animation-delay: -10s; }
+    .orb-set-4 .orb-gold { animation-duration: 20s; animation-delay: -6s; }
+    .orb-set-4 .orb-blue { animation-duration: 24s; animation-delay: -12s; }
+
+    .orb-set-5 .orb-green { animation-duration: 23s; animation-delay: -14s; }
+    .orb-set-5 .orb-gold { animation-duration: 28s; animation-delay: -9s; }
+    .orb-set-5 .orb-blue { animation-duration: 22s; animation-delay: -17s; }
+
+    .orb-set-6 .orb-green { animation-duration: 29s; animation-delay: -7s; }
+    .orb-set-6 .orb-gold { animation-duration: 24s; animation-delay: -16s; }
+    .orb-set-6 .orb-blue { animation-duration: 27s; animation-delay: -11s; }
+
+    .orb-set-7 .orb-green { animation-duration: 25s; animation-delay: -18s; }
+    .orb-set-7 .orb-gold { animation-duration: 30s; animation-delay: -12s; }
+    .orb-set-7 .orb-blue { animation-duration: 26s; animation-delay: -20s; }
+
+    .orb-set-8 .orb-green { animation-duration: 31s; animation-delay: -13s; }
+    .orb-set-8 .orb-gold { animation-duration: 26s; animation-delay: -21s; }
+    .orb-set-8 .orb-blue { animation-duration: 28s; animation-delay: -15s; }
+
+    .orb-set-9 .orb-green { animation-duration: 27s; animation-delay: -22s; }
+    .orb-set-9 .orb-gold { animation-duration: 32s; animation-delay: -18s; }
+    .orb-set-9 .orb-blue { animation-duration: 29s; animation-delay: -24s; }
+
+    @keyframes orbSlowFloat {
+      0% {
+        transform: translate3d(calc(-50% - 1.4vw), -2.2vh, 0) scale(1);
+      }
+      50% {
+        transform: translate3d(calc(-50% + 1.1vw), 1.8vh, 0) scale(1.025);
+      }
+      100% {
+        transform: translate3d(calc(-50% - 0.6vw), 2.6vh, 0) scale(0.985);
+      }
+    }
+
+    .orb-set-1 .orb-green { top: 72vh; }
+    .orb-set-1 .orb-gold { top: 90vh; }
+    .orb-set-1 .orb-blue { top: 54vh; }
+
+    .orb-set-2 .orb-green { top: 160vh; opacity: 0.88; }
+    .orb-set-2 .orb-gold { top: 180vh; opacity: 0.82; }
+    .orb-set-2 .orb-blue { top: 142vh; opacity: 0.8; }
+
+    .orb-set-3 .orb-green { top: 252vh; opacity: 0.78; }
+    .orb-set-3 .orb-gold { top: 272vh; opacity: 0.72; }
+    .orb-set-3 .orb-blue { top: 232vh; opacity: 0.72; }
+
+    .orb-set-4 .orb-green { top: 344vh; opacity: 0.72; }
+    .orb-set-4 .orb-gold { top: 364vh; opacity: 0.66; }
+    .orb-set-4 .orb-blue { top: 324vh; opacity: 0.68; }
+
+    .orb-set-5 .orb-green { top: 440vh; opacity: 0.8; }
+    .orb-set-5 .orb-gold { top: 462vh; opacity: 0.72; }
+    .orb-set-5 .orb-blue { top: 420vh; opacity: 0.7; }
+
+    .orb-set-6 .orb-green { top: 536vh; opacity: 0.78; }
+    .orb-set-6 .orb-gold { top: 560vh; opacity: 0.7; }
+    .orb-set-6 .orb-blue { top: 512vh; opacity: 0.72; }
+
+    .orb-set-7 .orb-green { top: 632vh; opacity: 0.76; }
+    .orb-set-7 .orb-gold { top: 656vh; opacity: 0.68; }
+    .orb-set-7 .orb-blue { top: 608vh; opacity: 0.7; }
+
+    .orb-set-8 .orb-green { top: 728vh; opacity: 0.72; }
+    .orb-set-8 .orb-gold { top: 752vh; opacity: 0.64; }
+    .orb-set-8 .orb-blue { top: 704vh; opacity: 0.66; }
+
+    .orb-set-9 .orb-green { top: 824vh; opacity: 0.7; }
+    .orb-set-9 .orb-gold { top: 850vh; opacity: 0.62; }
+    .orb-set-9 .orb-blue { top: 800vh; opacity: 0.64; }
 
     .nav {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      z-index: 999;
+      z-index: 1000;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -37,37 +295,109 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .nav a {
-      color: rgba(255, 255, 255, 0.68);
-      text-decoration: none;
-      margin-left: 24px;
-      font-size: 14px;
+    .nav-portfolio-label {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      pointer-events: none;
+      white-space: nowrap;
     }
 
-    .nav a:hover {
+    .nav-portfolio-label.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .nav a {
+      color: rgba(255, 255, 255, 0.58);
+      text-decoration: none;
+      margin-left: 18px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .nav a:hover,
+    .nav a.active {
       color: white;
     }
 
+    .nav-progress {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .nav-progress-fill {
+      display: block;
+      width: 100%;
+      height: 100%;
+      transform: scaleX(0);
+      transform-origin: left center;
+      background: linear-gradient(90deg, rgba(200, 164, 93, 0.12), rgba(200, 164, 93, 0.95), rgba(255, 255, 255, 0.62));
+      will-change: transform, opacity;
+      opacity: 0.28;
+    }
+
     .section {
-      min-height: 100vh;
+      min-height: 250vh;
       padding: 110px 6vw;
       display: grid;
       place-items: center;
       position: relative;
+      background: transparent;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    .section > .section-inner {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      will-change: transform, opacity;
+    }
+
+    .section-motion-content {
+      width: min(1120px, 100%);
+      will-change: transform, opacity;
     }
 
     .hero {
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 50% 45%, rgba(80, 150, 110, 0.28), transparent 28%),
-        radial-gradient(circle at 70% 62%, rgba(220, 180, 90, 0.16), transparent 24%),
-        linear-gradient(180deg, #020202 0%, #101010 100%);
+      min-height: 270vh;
+      padding: 0 6vw;
+      display: block;
+      overflow: visible;
+      background: transparent;
     }
 
     .hero-content {
+      position: sticky;
+      top: 0;
+      height: 100vh;
       text-align: center;
-      max-width: 1000px;
-      z-index: 2;
+      width: min(1100px, 100%);
+      max-width: 1100px;
+      z-index: 3;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 0;
+      overflow: visible;
+      will-change: transform, opacity;
     }
 
     .eyebrow {
@@ -79,15 +409,190 @@
       margin-bottom: 18px;
     }
 
+    .belief-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 58px;
+      margin-bottom: 0;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.085);
+      isolation: isolate;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(18px) saturate(130%);
+      -webkit-backdrop-filter: blur(18px) saturate(130%);
+      box-shadow:
+        0 26px 76px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      font-size: clamp(30px, 3.25vw, 48px);
+      font-weight: 800;
+      letter-spacing: 0.095em;
+      position: relative;
+      z-index: 4;
+      overflow: hidden;
+      will-change: transform, opacity, padding, font-size, filter;
+      cursor: pointer;
+      transition: box-shadow 0.22s ease, letter-spacing 0.22s ease;
+    }
+
+    .slogan-badge {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate3d(-50%, calc(-50% - 560px), 0) scale(0.46);
+      padding: 7px 13px;
+      font-size: clamp(10px, 0.9vw, 10px);
+      letter-spacing: 0.08em;
+      z-index: 5;
+      transition: none;
+      filter: blur(24px) saturate(85%);
+      will-change: transform, opacity, padding, font-size, filter;
+    }
+
+    .slogan-badge::before {
+      display: none;
+    }
+
+    .belief-badge.pop-click {
+      animation: badgePopClick 1.45s linear both;
+    }
+
+    .belief-badge::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 3.5px;
+      background: conic-gradient(
+        from var(--badge-angle),
+        rgba(178, 128, 255, 0.44) 0deg,
+        rgba(104, 218, 255, 0.58) 42deg,
+        rgba(122, 255, 192, 0.52) 86deg,
+        rgba(255, 211, 116, 0.56) 132deg,
+        rgba(255, 142, 186, 0.48) 176deg,
+        rgba(164, 135, 255, 0.5) 220deg,
+        rgba(96, 212, 255, 0.56) 266deg,
+        rgba(255, 220, 128, 0.5) 314deg,
+        rgba(178, 128, 255, 0.44) 360deg
+      );
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: calc(var(--badge-ring-opacity, 1) * 0.88);
+      filter: blur(0.16px) saturate(132%);
+      pointer-events: none;
+      z-index: -1;
+      animation: siriRing 6.8s linear infinite;
+    }
+
+    .belief-badge::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: -2;
+      background: transparent;
+      opacity: 0;
+    }
+
+    @keyframes siriRing {
+      0% { --badge-angle: 0deg; }
+      100% { --badge-angle: 360deg; }
+    }
+
+    @keyframes siriGlow {
+      0% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes badgePopClick {
+      0% {
+        --badge-pop-scale: 1;
+        --badge-pop-x: 1;
+        --badge-pop-y: 1;
+        --badge-soft-stretch: 1;
+      }
+      8% {
+        --badge-pop-scale: 0.996;
+        --badge-pop-x: 1.006;
+        --badge-pop-y: 0.994;
+        --badge-soft-stretch: 0.998;
+      }
+      18% {
+        --badge-pop-scale: 0.972;
+        --badge-pop-x: 1.034;
+        --badge-pop-y: 0.966;
+        --badge-soft-stretch: 0.988;
+      }
+      30% {
+        --badge-pop-scale: 0.99;
+        --badge-pop-x: 1.018;
+        --badge-pop-y: 0.982;
+        --badge-soft-stretch: 0.996;
+      }
+      43% {
+        --badge-pop-scale: 1.038;
+        --badge-pop-x: 0.972;
+        --badge-pop-y: 1.03;
+        --badge-soft-stretch: 1.018;
+      }
+      56% {
+        --badge-pop-scale: 1.024;
+        --badge-pop-x: 0.986;
+        --badge-pop-y: 1.018;
+        --badge-soft-stretch: 1.01;
+      }
+      69% {
+        --badge-pop-scale: 0.998;
+        --badge-pop-x: 1.01;
+        --badge-pop-y: 0.992;
+        --badge-soft-stretch: 0.998;
+      }
+      82% {
+        --badge-pop-scale: 1.006;
+        --badge-pop-x: 0.996;
+        --badge-pop-y: 1.004;
+        --badge-soft-stretch: 1.003;
+      }
+      92% {
+        --badge-pop-scale: 0.999;
+        --badge-pop-x: 1.002;
+        --badge-pop-y: 0.999;
+        --badge-soft-stretch: 1;
+      }
+      100% {
+        --badge-pop-scale: 1;
+        --badge-pop-x: 1;
+        --badge-pop-y: 1;
+        --badge-soft-stretch: 1;
+      }
+    }
+
     h1 {
-      font-size: clamp(58px, 10vw, 140px);
-      line-height: 0.9;
-      letter-spacing: -0.08em;
-      margin-bottom: 22px;
+      width: min(840px, 88vw);
+      max-width: 900px;
+      font-size: clamp(34px, 4.35vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      margin: 0;
+      text-wrap: balance;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 3;
+      opacity: 0;
+      transform: translate3d(-50%, calc(-50% + 20px), 0) scale(0.96);
+      will-change: transform, opacity;
+      pointer-events: none;
     }
 
     h2 {
-      font-size: clamp(40px, 7vw, 96px);
+      font-size: clamp(34px, 5.2vw, 72px);
       line-height: 0.95;
       letter-spacing: -0.07em;
       margin-bottom: 24px;
@@ -101,129 +606,873 @@
       margin: 0 auto;
     }
 
-    .hero-object {
-      width: min(860px, 82vw);
-      height: 430px;
-      margin: 70px auto 0;
-      border-radius: 36px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background:
-        radial-gradient(circle at 50% 35%, rgba(200, 164, 93, 0.25), transparent 32%),
-        linear-gradient(135deg, rgba(255,255,255,0.13), rgba(255,255,255,0.035));
-      box-shadow: 0 40px 120px rgba(0,0,0,0.48);
-      display: grid;
-      place-items: center;
-      color: rgba(255,255,255,0.42);
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      font-size: 12px;
+    .hero-role {
+      font-size: clamp(16px, 1.5vw, 22px);
+      color: rgba(255, 255, 255, 0.62);
+      position: relative;
+      z-index: 3;
+      will-change: transform, opacity;
+      transform: translateY(0);
+      margin-top: 34px;
+      display: var(--hero-role-display, block);
+    }
+
+    .hero-keywords {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(900px, 82vw);
+      height: min(560px, 62vh);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      z-index: 2;
       will-change: transform, opacity;
     }
 
+    .keyword-chip {
+      width: clamp(92px, 8.8vw, 126px);
+      --intro-scale: 0.58;
+      --gather-scale: 1;
+      height: clamp(92px, 8.8vw, 126px);
+      min-height: 0;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background:
+        radial-gradient(circle at 38% 28%, rgba(255, 255, 255, 0.34), transparent 22%),
+        radial-gradient(circle at 58% 62%, rgba(200, 164, 93, 0.1), transparent 44%),
+        linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 22px 64px rgba(0,0,0,0.3);
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(-50%, -50%) scale(var(--intro-scale));
+      transition: box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease, color 0.35s ease, opacity 0.35s ease;
+      position: absolute;
+      overflow: hidden;
+    }
+
+    .keyword-chip:nth-child(1) {
+      --start-x: -28%;
+      --start-y: 58%;
+      --end-x: 18%;
+      --end-y: 58%;
+      left: var(--start-x);
+      top: var(--start-y);
+    }
+
+    .keyword-chip:nth-child(2) {
+      --start-x: -36%;
+      --start-y: 64%;
+      --end-x: 34%;
+      --end-y: 63%;
+      left: var(--start-x);
+      top: var(--start-y);
+    }
+
+    .keyword-chip:nth-child(3) {
+      --start-x: -44%;
+      --start-y: 55%;
+      --end-x: 50%;
+      --end-y: 60%;
+      left: var(--start-x);
+      top: var(--start-y);
+    }
+
+    .keyword-chip:nth-child(4) {
+      --start-x: -52%;
+      --start-y: 68%;
+      --end-x: 66%;
+      --end-y: 63%;
+      left: var(--start-x);
+      top: var(--start-y);
+    }
+
+    .keyword-chip:nth-child(5) {
+      --start-x: -60%;
+      --start-y: 60%;
+      --end-x: 82%;
+      --end-y: 58%;
+      left: var(--start-x);
+      top: var(--start-y);
+    }
+
+    .keyword-chip::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: transparent;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .keyword-chip::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 -22px 44px rgba(0,0,0,0.16), inset 0 18px 30px rgba(255,255,255,0.08);
+      pointer-events: none;
+    }
+
+    .keyword-chip.visible {
+      opacity: 1;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    .keyword-chip.floating {
+      animation: keywordGlassFloat 5.8s ease-in-out infinite alternate;
+    }
+
+    .keyword-chip.floating:nth-child(1) { animation-duration: 6.2s; animation-delay: -1.1s; }
+    .keyword-chip.floating:nth-child(2) { animation-duration: 5.4s; animation-delay: -2.4s; }
+    .keyword-chip.floating:nth-child(3) { animation-duration: 6.8s; animation-delay: -3.2s; }
+    .keyword-chip.floating:nth-child(4) { animation-duration: 5.9s; animation-delay: -1.8s; }
+    .keyword-chip.floating:nth-child(5) { animation-duration: 6.5s; animation-delay: -2.9s; }
+
+    .keyword-chip {
+      pointer-events: none;
+      clip-path: inset(-80px);
+    }
+
+    @keyframes keywordGlassFloat {
+      0% { translate: -7px -5px; }
+      35% { translate: 6px -9px; }
+      70% { translate: 9px 7px; }
+      100% { translate: -4px 8px; }
+    }
     .cards-section {
-      background: #090909;
+      background: transparent;
+      margin-top: -72vh;
+      padding-top: 0;
+      min-height: 250vh;
+    }
+
+    .cards-section .section-inner {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding-top: 72px;
+      padding-bottom: 56px;
+      overflow: hidden;
+    }
+
+    .cards-section h2 {
+      max-width: 880px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 18px;
+      font-size: clamp(38px, 5vw, 68px);
+      line-height: 0.98;
+    }
+
+    .cards-section p {
+      max-width: 760px;
+      font-size: clamp(15px, 1.45vw, 19px);
+      line-height: 1.5;
+      margin-top: 12px;
     }
 
     .cards {
-      width: min(1120px, 100%);
+      width: min(980px, 100%);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-      margin-top: 56px;
+      gap: 16px;
+      margin-top: 28px;
     }
 
     .card {
-      min-height: 280px;
-      border-radius: 28px;
-      padding: 34px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035));
-      box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+      min-height: 170px;
+      border-radius: 22px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.32);
     }
 
     .card-number {
-      font-size: 52px;
+      font-size: 42px;
       font-weight: 900;
       color: #c8a45d;
       letter-spacing: -0.06em;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
+    }
+
+    .contact-card {
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .contact-card .card-number {
+      font-size: clamp(24px, 2.8vw, 36px);
+      letter-spacing: -0.04em;
+      margin-bottom: 16px;
+    }
+
+    .contact-card p {
+      margin: 0;
+      font-size: clamp(14px, 1.15vw, 16px);
+      line-height: 1.45;
+      max-width: none;
+    }
+
+    .contact-card a {
+      color: rgba(255, 255, 255, 0.82);
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .contact-card a:hover {
+      color: white;
     }
 
     .sticky-section {
-      height: 320vh;
-      background: #f3eee3;
-      color: #111;
+      min-height: 700vh;
+      background: transparent;
+      color: white;
       padding: 0;
     }
 
     .sticky-stage {
       position: sticky;
       top: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.85fr);
       align-items: center;
-      gap: 5vw;
-      padding: 110px 6vw;
+      gap: 6vw;
+      padding: 112px 6vw 70px;
       overflow: hidden;
+      background: transparent;
     }
 
-    .sticky-text h2 {
-      color: #111;
+    .case-study-copy {
+      max-width: 640px;
+      align-self: center;
+      justify-self: start;
+      will-change: transform, opacity;
+      position: relative;
+      z-index: 2;
     }
 
-    .sticky-text p {
-      color: rgba(0,0,0,0.58);
-      margin: 0;
+    .case-study-eyebrow {
+      color: #c8a45d;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 16px;
     }
 
-    .sticky-visual {
-      height: 62vh;
-      border-radius: 36px;
+    .case-study-intent-badge {
+      position: absolute;
+      left: 50%;
+      top: -96px;
+      transform: translateX(-50%) translateY(-28px) scale(0.72);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 24px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.085);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(18px) saturate(130%);
+      -webkit-backdrop-filter: blur(18px) saturate(130%);
+      box-shadow:
+        0 22px 70px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      opacity: 0;
+      filter: blur(20px) saturate(85%);
+      pointer-events: none;
+      will-change: transform, opacity, filter;
+    }
+
+    .case-study-poster-frame {
+      grid-column: 2;
+      grid-row: 1;
+      width: min(430px, 31vw);
+      aspect-ratio: 0.707 / 1;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: 0 34px 96px rgba(0, 0, 0, 0.46);
+      overflow: visible;
+      opacity: 0;
+      transform: translateY(42px) scale(0.96);
+      filter: blur(18px);
+      pointer-events: none;
+      will-change: transform, opacity, filter;
+      justify-self: center;
+      align-self: center;
+      z-index: 1;
+      padding: 0;
+    }
+
+    .case-study-poster-frame object,
+    .case-study-poster-frame iframe,
+    .case-study-poster-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+      object-fit: contain;
+      background: transparent;
+      filter: drop-shadow(0 24px 54px rgba(0, 0, 0, 0.42));
+    }
+
+    .case-study-title {
+      font-size: clamp(40px, 5.8vw, 82px);
+      line-height: 0.9;
+      letter-spacing: -0.075em;
+      margin: 0 0 22px;
+    }
+
+    .case-study-subtitle {
+      font-size: clamp(20px, 2.6vw, 34px);
+      line-height: 1.04;
+      letter-spacing: -0.055em;
+      margin: 0 0 18px;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .case-study-copy p {
+      margin: 0 0 14px;
+      max-width: 620px;
+      font-size: clamp(13px, 1.18vw, 16px);
+      line-height: 1.58;
+      color: rgba(255, 255, 255, 0.68);
+    }
+
+    .case-study-copy.intent-layout {
+      max-width: 590px;
+    }
+
+    .feedback-list {
+      display: grid;
+      gap: 13px;
+      margin-top: 18px;
+    }
+
+    .case-study-copy.feedback-slide {
+      max-height: none;
+      overflow: visible;
+      padding-right: 0;
+    }
+
+.case-study-copy.impact-reflection-scroll {
+  height: 72vh;
+  max-height: 72vh;
+  overflow: hidden;
+  padding-right: 18px;
+  align-self: center;
+}
+
+.case-study-copy.impact-reflection-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.case-study-copy.impact-reflection-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.case-study-copy.impact-reflection-scroll::-webkit-scrollbar-thumb {
+  background: rgba(200, 164, 93, 0.55);
+  border-radius: 999px;
+}
+
+.scroll-story-block {
+  height: 72vh;
+  min-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4vh 0;
+}
+
+.scroll-story-block + .scroll-story-block {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scroll-story-eyebrow {
+  color: #c8a45d;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.scroll-story-title {
+  font-size: clamp(40px, 5.8vw, 82px);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+  margin: 0 0 22px;
+}
+
+    .feedback-fixed-image {
+      max-width: min(420px, 30vw);
+      max-height: 68vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      transform: translateY(-34px) rotate(4deg);
+      filter: drop-shadow(0 28px 60px rgba(0, 0, 0, 0.44));
+    }
+
+    .case-visual-placeholder-card {
+      width: min(420px, 30vw);
+      min-height: min(520px, 62vh);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
       background:
-        radial-gradient(circle at 50% 30%, rgba(200, 164, 93, 0.26), transparent 32%),
-        linear-gradient(135deg, rgba(0,0,0,0.10), rgba(0,0,0,0.035));
-      border: 1px solid rgba(0,0,0,0.08);
-      box-shadow: 0 34px 90px rgba(0,0,0,0.15);
+        radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.14), transparent 28%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035));
+      backdrop-filter: blur(20px) saturate(130%);
+      -webkit-backdrop-filter: blur(20px) saturate(130%);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.16);
       display: grid;
       place-items: center;
-      color: rgba(0,0,0,0.38);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
+      padding: 28px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.78);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .case-visual-placeholder-card::before {
+      content: "";
+      position: absolute;
+      inset: 22px;
+      border-radius: 22px;
+      border: 1px dashed rgba(200, 164, 93, 0.42);
+      pointer-events: none;
+    }
+
+    .case-visual-placeholder-card span {
+      position: relative;
+      z-index: 2;
+      display: block;
+      max-width: 240px;
       font-size: 12px;
-      will-change: transform, opacity, border-radius;
+      font-weight: 800;
+      line-height: 1.5;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.72);
     }
 
-    .gallery-section {
-      background:
-        radial-gradient(circle at 20% 20%, rgba(80,150,110,0.22), transparent 26%),
-        #050505;
+    .final-product-image-pair {
+      width: min(560px, 36vw);
+      height: min(430px, 54vh);
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: center;
+      justify-items: center;
+      gap: 18px;
+      transform-style: preserve-3d;
+      transform: translateX(-70px) translateY(70px);
     }
 
-    .gallery {
+    .final-product-image-pair img {
+      position: relative;
+      left: auto;
+      top: auto;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      transform: none;
+      filter: drop-shadow(0 22px 52px rgba(0, 0, 0, 0.44));
+      will-change: transform, opacity, filter;
+    }
+
+    .final-product-image-pair img:first-child {
+      z-index: 1;
+    }
+
+    .final-product-image-pair img:last-child {
+      z-index: 2;
+    }
+
+    .feedback-item {
+      padding: 14px 15px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.055);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .feedback-item strong {
+      display: block;
+      margin-bottom: 7px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+
+    .case-study-visual-grid {
+      grid-column: 2;
+      grid-row: 1;
+      width: min(440px, 28vw);
+      height: min(540px, 58vh);
+      justify-self: center;
+      align-self: center;
+      position: relative;
+      will-change: transform, opacity;
+      z-index: 2;
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      display: grid;
+      place-items: center;
+    }
+
+    .case-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      position: relative;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      overflow: visible;
+      will-change: transform, opacity, filter, border-radius;
+      transform-origin: 50% 58%;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .case-image-placeholder img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      background: transparent;
+      filter: drop-shadow(0 24px 54px rgba(0, 0, 0, 0.42));
+    }
+
+    .case-image-placeholder.impact-reflection-poster {
+      width: min(430px, 31vw);
+      height: min(608px, 68vh);
+      opacity: 1;
+      transform: none;
+      filter: none;
+      display: grid;
+      place-items: center;
+      align-self: center;
+      justify-self: center;
+    }
+
+    .case-study-visual-grid.impact-reflection-grid {
+      transform: translateY(0px) scale(1) rotateZ(0deg) !important;
+      align-self: center;
+      justify-self: center;
+    }
+
+    .case-image-stack {
+      position: relative;
+      width: min(560px, 39vw);
+      height: min(540px, 60vh);
+      transform-style: preserve-3d;
+    }
+
+    .case-image-stack img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      max-width: 50%;
+      max-height: 45%;
+      border-radius: 0;
+      transform-origin: center;
+      opacity: var(--stack-img-opacity, 1);
+      filter: blur(var(--stack-img-blur, 0px)) drop-shadow(0 24px 54px rgba(0, 0, 0, 0.42));
+      transition: opacity 0.38s ease, filter 0.38s ease;
+      will-change: transform, opacity, filter;
+    }
+
+    .case-image-stack img:nth-child(1) {
+      transform: translate(-96%, -82%) rotate(-11deg);
+    }
+
+    .case-image-stack img:nth-child(2) {
+      transform: translate(-10%, -76%) rotate(8deg);
+    }
+
+    .case-image-stack img:nth-child(3) {
+      transform: translate(-88%, 0%) rotate(7deg);
+    }
+
+    .case-image-stack img:nth-child(4) {
+      transform: translate(2%, 10%) rotate(-9deg);
+    }
+
+    .packaging-image-stack img:nth-child(1) {
+      max-width: 62%;
+      max-height: 42%;
+      transform: translate(-84%, -84%) rotate(-5deg);
+    }
+
+    .packaging-image-stack img:nth-child(2) {
+      max-width: 44%;
+      max-height: 34%;
+      transform: translate(-2%, -76%) rotate(6deg);
+    }
+
+    .packaging-image-stack img:nth-child(3) {
+      max-width: 39%;
+      max-height: 46%;
+      transform: translate(-92%, -8%) rotate(7deg);
+    }
+
+    .packaging-image-stack img:nth-child(4) {
+      max-width: 39%;
+      max-height: 46%;
+      transform: translate(0%, 0%) rotate(-8deg);
+    }
+
+    .tolerance-image-stack {
+      transform: translateX(-58px);
+    }
+
+    .tolerance-image-stack img:nth-child(1) {
+      max-width: 86%;
+      max-height: 36%;
+      transform: translate(-50%, 18%) rotate(-2deg);
+      z-index: 10;
+    }
+
+    .tolerance-image-stack img:nth-child(2) {
+      max-width: 30%;
+      max-height: 44%;
+      transform: translate(-124%, -86%) rotate(-7deg);
+      z-index: 2;
+    }
+
+    .tolerance-image-stack img:nth-child(3) {
+      max-width: 30%;
+      max-height: 44%;
+      transform: translate(-50%, -92%) rotate(3deg);
+      z-index: 3;
+    }
+
+    .tolerance-image-stack img:nth-child(4) {
+      max-width: 30%;
+      max-height: 44%;
+      transform: translate(24%, -86%) rotate(7deg);
+      z-index: 4;
+    }
+
+    .case-image-placeholder span {
+      position: relative;
+      z-index: 2;
+    }
+
+    .case-image-placeholder::after {
+      display: none;
+    }
+
+    .case-study-visual-grid.intent-hidden {
+      opacity: 0 !important;
+      transform: translateY(44px) scale(0.96) !important;
+      pointer-events: none;
+    }
+
+    .projects-section {
+      background: transparent;
+      min-height: 100vh;
+      padding-top: 140px;
+      padding-bottom: 140px;
+      display: block;
+    }
+
+    .projects-section > .section-inner {
+      position: relative;
+      top: auto;
+      min-height: auto;
+      display: block;
+    }
+
+    .projects-template {
       width: min(1120px, 100%);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-top: 56px;
+      gap: 28px;
     }
 
-    .tile {
-      height: 220px;
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.035));
+    .projects-template-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .projects-template-header p {
+      max-width: 720px;
+      font-size: clamp(13px, 1.25vw, 16px);
+      line-height: 1.55;
+    }
+
+    .project-template-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .project-template-card {
+      min-height: 430px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background:
+        radial-gradient(circle at 32% 18%, rgba(200, 164, 93, 0.13), transparent 30%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
+      backdrop-filter: blur(20px) saturate(130%);
+      -webkit-backdrop-filter: blur(20px) saturate(130%);
+      box-shadow: 0 30px 86px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      overflow: hidden;
+      display: grid;
+      align-items: center;
+    }
+
+    .project-template-image {
       display: grid;
       place-items: center;
-      color: rgba(255,255,255,0.38);
+      align-content: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.045);
+      color: rgba(255, 255, 255, 0.42);
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.16em;
       font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .project-template-image small {
+      max-width: 260px;
+      color: rgba(255, 255, 255, 0.34);
+      font-size: 10px;
+      line-height: 1.45;
+      letter-spacing: 0.08em;
+      text-transform: none;
+      font-weight: 700;
+    }
+
+    .project-template-content {
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100%;
+    }
+
+    .project-template-kicker {
+      color: #c8a45d;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .project-template-card h3 {
+      font-size: clamp(26px, 2.65vw, 38px);
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+      margin-bottom: 14px;
+    }
+
+    .project-template-card p {
+      max-width: none;
+      margin: 0 0 14px;
+      font-size: clamp(13px, 1.12vw, 16px);
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.66);
+    }
+
+    .project-template-meta {
+      display: grid;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .project-template-meta span {
+      display: block;
+      padding: 11px 13px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .project-template-meta a {
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(200, 164, 93, 0.55);
+    }
+
+    .project-template-meta a:hover {
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.8);
     }
 
     .end-section {
-      background: #050505;
+      background: transparent;
       text-align: center;
+      min-height: 100vh;
+      padding-top: 160px;
+      padding-bottom: 5vh;
+      display: block;
+    }
+
+    .end-section > .section-inner {
+      position: relative;
+      top: auto;
+      min-height: 55vh;
+      display: grid;
+      place-items: center;
+    }
+
+    .end-section a {
+      color: rgba(255, 255, 255, 0.86);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(200, 164, 93, 0.55);
+    }
+
+    .end-section a:hover {
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.8);
     }
 
     .reveal {
@@ -248,13 +1497,46 @@
 
     @media (max-width: 900px) {
       .nav-links { display: none; }
-      .section { padding: 90px 24px; }
-      .hero-object { height: 300px; }
-      .cards, .gallery, .sticky-stage {
+      .section {
+        padding: 90px 24px;
+        min-height: 155vh;
+      }
+      h1 {
+        font-size: clamp(34px, 10vw, 56px);
+        line-height: 1.12;
+        letter-spacing: -0.045em;
+      }
+      .hero {
+        min-height: 205vh;
+        padding: 0 24px;
+      }
+      .hero-content {
+        padding-top: 150px;
+      }
+      .hero-keywords {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 34px;
+      }
+
+      .keyword-chip,
+      .keyword-chip:nth-child(2),
+      .keyword-chip:nth-child(3),
+      .keyword-chip:nth-child(4) {
+        min-height: 58px;
+        margin-top: 0;
+      }
+      .cards, .sticky-stage, .project-template-grid {
         grid-template-columns: 1fr;
       }
       .sticky-stage {
         padding: 90px 24px;
+      }
+      .case-study-poster-frame {
+        grid-column: 1;
+        grid-row: auto;
+        width: min(520px, 82vw);
+        aspect-ratio: 0.707 / 1;
       }
       .sticky-visual {
         height: 42vh;
@@ -263,88 +1545,321 @@
   </style>
 </head>
 <body>
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="intro-stars" id="introStars"></div>
+    <div class="orb-layer" id="orbLayer">
+      <div class="orb-set-1">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-2">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-3">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-4">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-5">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-6">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-7">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-8">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+      <div class="orb-set-9">
+        <div class="orb orb-green"></div>
+        <div class="orb orb-gold"></div>
+        <div class="orb orb-blue"></div>
+      </div>
+    </div>
+  </div>
+  <button class="scroll-edge-light top" id="topEdgeLight" type="button" aria-label="Go to previous section"></button>
+  <button class="scroll-edge-light bottom" id="bottomEdgeLight" type="button" aria-label="Go to next section"></button>
   <nav class="nav">
-    <strong>Logo / Name</strong>
-    <div class="nav-links">
-      <a href="#intro">Intro</a>
-      <a href="#sticky">Sticky</a>
-      <a href="#gallery">Gallery</a>
+    <strong id="navName">Junqi Wu</strong>
+    <span class="nav-portfolio-label" id="navPortfolioLabel">Product Design Portfolio</span>
+    <div class="nav-links" aria-label="Page sections">
+      <a href="#intro" data-section="intro">Intro</a>
+      <a href="#slogan" data-section="slogan">Slogan</a>
+      <a href="#statement" data-section="statement">Statement</a>
+      <a href="#case-study" data-section="case-study">Case-study</a>
+      <a href="#contact" data-section="contact">Contact</a>
+    </div>
+    <div class="nav-progress" aria-hidden="true">
+      <span class="nav-progress-fill" id="navProgressFill"></span>
     </div>
   </nav>
 
   <section class="section hero" id="intro">
     <div class="hero-content reveal">
-      <div class="eyebrow">Scrolling Animation Template</div>
-      <h1>Big Hero Title</h1>
-      <p>This is a placeholder hero section. Replace this text with your own portfolio introduction later.</p>
-      <div class="hero-object float">Hero Image / Product Render</div>
+      <div class="belief-badge" id="heroBadge">Product Design Portfolio</div>
+      <div class="belief-badge slogan-badge" id="sloganBadge">My Slogan</div>
+      <h1 id="heroTitle">Before designing, figure out why it should exist — then figure out how it should exist.</h1>
+      <p class="hero-role" id="heroRole">-by Junqi Wu</p>
+      <div class="hero-keywords" id="heroKeywords" aria-label="Product design process keywords">
+        <div class="keyword-chip">Problem</div>
+        <div class="keyword-chip">Need</div>
+        <div class="keyword-chip">Prototype</div>
+        <div class="keyword-chip">Test</div>
+        <div class="keyword-chip">Refine</div>
+      </div>
     </div>
   </section>
 
-  <section class="section cards-section">
-    <div>
-      <div class="reveal" style="text-align: center;">
-        <div class="eyebrow">Reveal Cards</div>
-        <h2>Cards fade in on scroll</h2>
-        <p>These cards appear when they enter the viewport. Replace them with project features, process steps, or case study highlights.</p>
-      </div>
-      <div class="cards">
-        <div class="card reveal">
-          <div class="card-number">01</div>
-          <p>Placeholder card content.</p>
-        </div>
-        <div class="card reveal">
-          <div class="card-number">02</div>
-          <p>Placeholder card content.</p>
-        </div>
-        <div class="card reveal">
-          <div class="card-number">03</div>
-          <p>Placeholder card content.</p>
+  <section class="section cards-section" id="statement">
+    <div class="section-inner">
+      <div class="section-motion-content">
+        <div class="reveal" style="text-align: center;">
+          <div class="eyebrow">Position Statement</div>
+          <h2>Design starts with real problems</h2>
+          <p>I’m currently studying Interaction Design at USYD, and my ultimate career goal is to become a Product Designer. I believe that before starting to design a product, the process should begin with identifying the problem. Many designs may appear to solve a problem on the surface, but they do not address users’ real needs.</p>
+          <p>I also place great importance on user testing, because without testing an idea, it is difficult to determine whether it actually works, and it is also hard to know how to adjust it in the next step.</p>
+          <p>I believe that good design should not only look attractive, but also be genuinely useful and able to solve problems that have not yet been solved.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="sticky-section" id="sticky">
+  <section class="sticky-section" id="case-study">
     <div class="sticky-stage">
-      <div class="sticky-text">
-        <div class="eyebrow">Sticky Scroll</div>
-        <h2 id="stickyTitle">Sticky product moment</h2>
-        <p id="stickyText">As you scroll through this section, the right image block scales, rotates, and changes shape. This creates an Apple-style scrolling product showcase.</p>
+      <div class="case-study-copy" id="caseStudyCopy">
+        <div class="case-study-eyebrow" id="caseStudyEyebrow">Intent</div>
+        <h2 class="case-study-title" id="caseStudyTitle">Intent</h2>
+        <div id="caseStudyBody">
+          <p>When working on this project, I first identified the target users of this product as fans of O’Sullivan and snooker fans. The main issue I considered in this project was how to transform an abstract sports story into a commemorative product that people can understand, that can be manufactured and held in the hand, and that is visible and tangible.</p>
+        </div>
       </div>
-      <div class="sticky-visual" id="stickyVisual">Sticky Visual</div>
-    </div>
-  </section>
-
-  <section class="section gallery-section" id="gallery">
-    <div>
-      <div class="reveal" style="text-align: center;">
-        <div class="eyebrow">Gallery</div>
-        <h2>Image grid reveal</h2>
-        <p>Use this section for process images, sketches, renders, prototypes, or final outcomes.</p>
+      <div class="case-study-visual-grid" id="caseStudyVisualGrid" aria-label="Case study sticky visual">
+        <div class="case-image-placeholder" id="caseStudyStickyVisual"><img src="moodb.png" alt="Moodboard"></div>
       </div>
-      <div class="gallery">
-        <div class="tile reveal">Image 1</div>
-        <div class="tile reveal">Image 2</div>
-        <div class="tile reveal">Image 3</div>
-        <div class="tile reveal">Image 4</div>
-        <div class="tile reveal">Image 5</div>
-        <div class="tile reveal">Image 6</div>
-        <div class="tile reveal">Image 7</div>
-        <div class="tile reveal">Image 8</div>
+      <div class="case-study-poster-frame" id="caseStudyPosterFrame" aria-label="Blender poster preview">
+        <img src="2018-blender-poster.png" alt="Blender poster preview">
       </div>
     </div>
   </section>
 
-  <section class="section end-section">
-    <div class="reveal">
-      <div class="eyebrow">End Section</div>
-      <h2>Final Call to Action</h2>
-      <p>Replace this with contact details, portfolio links, or a closing statement.</p>
+  <section class="section projects-section" id="case-study-projects">
+    <div class="section-inner">
+      <div class="section-motion-content projects-template">
+        <div class="reveal projects-template-header">
+          <div class="eyebrow">Case-study</div>
+          <h2>More Projects</h2>
+        </div>
+
+        <div class="project-template-grid">
+          <article class="project-template-card reveal">
+            <div class="project-template-content">
+              <h3>Design Theory Zine</h3>
+              <p>This is a design theory zine created to summarize the design theories learned in DESN1001. The content includes different design themes, related design case studies, critical analysis, and five complex transformation exercises. Through this project, I learned how to express theoretical research in a visual form, and how to understand and transform everyday objects from a design perspective.</p>
+
+              <div class="project-template-meta">
+                <span><strong>PDF:</strong> <a href="A3Zine_540767287.pdf" target="_blank" rel="noopener noreferrer">View Zine PDF</a></span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-template-card reveal">
+            <div class="project-template-content">
+              <h3>Shopping Calendar App</h3>
+              <p>This is a prototype that combines shopping and calendar functions. Users can view their shopping plans, set up automatic purchases, and complete payments within the app. Through this project, I learned that good interaction design allows users to understand what they should do at each step with very little learning effort.</p>
+
+              <div class="project-template-meta">
+                <span><strong>PDF:</strong> <a href="A5_Report_540767287.pdf" target="_blank" rel="noopener noreferrer">View Project PDF</a></span>
+                <span><strong>Figma:</strong> <a href="https://www.figma.com/design/IwhMkAvMteHvjapMePyUpk/2102_Final_540767287?node-id=0-1&t=D1pGj6TXt0TqFdOV-1" target="_blank" rel="noopener noreferrer">View Figma Prototype</a></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section end-section" id="contact">
+    <div class="section-inner">
+      <div class="section-motion-content reveal">
+        <div class="eyebrow">Contact</div>
+        <h2>Get in Touch</h2>
+        <p>Email: <a href="mailto:dachaoren55@gmail.com">dachaoren55@gmail.com</a></p>
+        <p>LinkedIn: <a href="https://www.linkedin.com/in/junqi-wu-a287112bb" target="_blank" rel="noopener noreferrer">www.linkedin.com/in/junqi-wu-a287112bb</a></p>
+      </div>
     </div>
   </section>
 
   <script>
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    function syncScrollAnimationState() {
+      window.dispatchEvent(new Event('scroll'));
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+    }
+
+    window.addEventListener('load', () => {
+      const hash = window.location.hash.replace('#', '');
+      const targetSection = hash ? getPageById(hash) : null;
+      if (targetSection) {
+        scrollToSection(targetSection, false);
+      } else {
+        window.scrollTo(0, 0);
+      }
+
+      requestAnimationFrame(() => {
+        syncScrollAnimationState();
+        setTimeout(syncScrollAnimationState, 80);
+      });
+    });
+    const orbLayer = document.querySelector('#orbLayer');
+    const introStars = document.querySelector('#introStars');
+    const topEdgeLight = document.querySelector('#topEdgeLight');
+
+    const introStarParticles = [];
+
+    function createIntroStars() {
+      if (!introStars || introStarParticles.length) return;
+
+      const starCount = 111;
+      const centreX = 50;
+      const centreY = 50;
+
+      for (let i = 0; i < starCount; i += 1) {
+        const star = document.createElement('span');
+        const clusterChance = Math.random();
+        let x;
+        let y;
+
+        if (clusterChance < 0.48) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.pow(Math.random(), 1.15) * 58;
+          const ovalX = 1.32;
+          const ovalY = 0.9;
+          x = centreX + Math.cos(angle) * distance * ovalX;
+          y = centreY + Math.sin(angle) * distance * ovalY;
+        } else {
+          x = Math.random() * 100;
+          y = Math.random() * 100;
+        }
+
+        x = clamp(x, -4, 104);
+        y = clamp(y, -4, 104);
+
+        const dx = x - centreX;
+        const dy = y - centreY;
+        const length = Math.max(1, Math.hypot(dx, dy));
+        const flyDistance = 120 + Math.random() * 120;
+        const flyX = (dx / length) * flyDistance + (Math.random() - 0.5) * 34;
+        const flyY = (dy / length) * flyDistance + (Math.random() - 0.5) * 34;
+        const centreBoost = 1 - clamp(length / 66, 0, 1);
+        const size = 0.9 + centreBoost * 0.72 + Math.random() * 1.15;
+        const brightness = 0.34 + centreBoost * 0.28 + Math.random() * 0.28;
+        const opacity = 0.36 + centreBoost * 0.32 + Math.random() * 0.32;
+        const glow = 4 + centreBoost * 6 + Math.random() * 10;
+        const twinkleDuration = 0.85 + Math.random() * 1.7;
+
+        star.className = `intro-star-particle${Math.random() < 0.12 ? ' gold' : ''}`;
+        star.style.setProperty('--star-x', x.toFixed(2));
+        star.style.setProperty('--star-y', y.toFixed(2));
+        star.style.setProperty('--star-size', `${size.toFixed(2)}px`);
+        star.style.setProperty('--star-brightness', brightness.toFixed(2));
+        star.style.setProperty('--star-opacity', opacity.toFixed(2));
+        star.style.setProperty('--star-glow', `${glow.toFixed(2)}px`);
+        star.style.setProperty('--star-twinkle-duration', `${twinkleDuration.toFixed(2)}s`);
+        star.style.animationDelay = `${(-Math.random() * twinkleDuration).toFixed(2)}s`;
+        star.dataset.flyX = flyX.toFixed(2);
+        star.dataset.flyY = flyY.toFixed(2);
+        star.dataset.twinkle = (0.82 + Math.random() * 0.36).toFixed(2);
+        star.dataset.floatX = (2 + Math.random() * 7).toFixed(2);
+        star.dataset.floatY = (2 + Math.random() * 6).toFixed(2);
+        star.dataset.floatSpeedX = (0.55 + Math.random() * 0.85).toFixed(2);
+        star.dataset.floatSpeedY = (0.45 + Math.random() * 0.75).toFixed(2);
+        star.dataset.floatPhase = (Math.random() * Math.PI * 2).toFixed(3);
+        introStars.appendChild(star);
+        introStarParticles.push(star);
+      }
+    }
+
+    createIntroStars();
+    const bottomEdgeLight = document.querySelector('#bottomEdgeLight');
+    let currentOrbY = 0;
+    let targetOrbY = 0;
+    let orbAnimationFrame = null;
+    let starFloatAnimationFrame = null;
+
+    function animateStarFloat() {
+      if (!introStars || !introStars.classList.contains('visible')) {
+        starFloatAnimationFrame = null;
+        return;
+      }
+
+      const time = performance.now() * 0.001;
+      const scrollY = window.scrollY || 0;
+      const flyProgress = smootherstep(Math.min(Math.max(scrollY / (window.innerHeight * 0.34), 0), 1));
+
+      introStarParticles.forEach((star, index) => {
+        const flyX = Number(star.dataset.flyX || 0);
+        const flyY = Number(star.dataset.flyY || 0);
+        const stagger = (index % 17) * 0.006;
+        const localFly = smootherstep(clamp((flyProgress - stagger) / 0.88, 0, 1));
+        const floatX = Number(star.dataset.floatX || 4);
+        const floatY = Number(star.dataset.floatY || 3);
+        const speedX = Number(star.dataset.floatSpeedX || 0.8);
+        const speedY = Number(star.dataset.floatSpeedY || 0.7);
+        const phase = Number(star.dataset.floatPhase || 0);
+        const moveX = Math.sin(time * speedX + phase) * floatX;
+        const moveY = Math.cos(time * speedY + phase + index * 0.11) * floatY;
+        const drift = Math.sin(scrollY * 0.002 + index) * 4;
+        const scale = 1 + localFly * 1.2;
+        const opacityDrop = 1 - localFly;
+
+        star.style.transform = `translate3d(${flyX * localFly + drift + moveX}px, ${flyY * localFly - scrollY * 0.035 + moveY}px, 0) scale(${scale})`;
+        star.style.setProperty('--star-opacity', `${Number(star.dataset.twinkle || 1) * opacityDrop}`);
+      });
+
+      starFloatAnimationFrame = requestAnimationFrame(animateStarFloat);
+    }
+
+    function animateOrbLayer() {
+      currentOrbY += (targetOrbY - currentOrbY) * 0.16;
+
+      if (orbLayer) {
+        orbLayer.style.transform = `translate3d(0, ${currentOrbY}px, 0)`;
+      }
+
+      if (Math.abs(targetOrbY - currentOrbY) > 0.2) {
+        orbAnimationFrame = requestAnimationFrame(animateOrbLayer);
+      } else {
+        currentOrbY = targetOrbY;
+        if (orbLayer) {
+          orbLayer.style.transform = `translate3d(0, ${currentOrbY}px, 0)`;
+        }
+        orbAnimationFrame = null;
+      }
+    }
+
     const revealElements = document.querySelectorAll('.reveal');
 
     const revealObserver = new IntersectionObserver((entries) => {
@@ -362,50 +1877,992 @@
       revealObserver.observe(element);
     });
 
-    const heroObject = document.querySelector('.hero-object');
+    const heroKeywords = document.querySelector('#heroKeywords');
+    const keywordChips = document.querySelectorAll('.keyword-chip');
+    const heroTitle = document.querySelector('#heroTitle');
+    const heroContent = document.querySelector('.hero-content');
+    const heroRole = document.querySelector('#heroRole');
+    const heroBadge = document.querySelector('#heroBadge');
+    const sloganBadge = document.querySelector('#sloganBadge');
+    const navPortfolioLabel = document.querySelector('#navPortfolioLabel');
+    const heroSection = document.querySelector('.hero');
     const stickySection = document.querySelector('.sticky-section');
-    const stickyVisual = document.querySelector('#stickyVisual');
-    const stickyTitle = document.querySelector('#stickyTitle');
-    const stickyText = document.querySelector('#stickyText');
+    const caseStudyCopy = document.querySelector('#caseStudyCopy');
+    const caseStudyEyebrow = document.querySelector('#caseStudyEyebrow');
+    const caseStudyTitle = document.querySelector('#caseStudyTitle');
+    const caseStudyBody = document.querySelector('#caseStudyBody');
+    const caseStudyVisualGrid = document.querySelector('#caseStudyVisualGrid');
+    const caseStudyIntentBadge = null;
+    const caseStudyPosterFrame = document.querySelector('#caseStudyPosterFrame');
+    const caseStudyStickyVisual = document.querySelector('#caseStudyStickyVisual');
+    const motionSections = document.querySelectorAll('.section:not(.hero):not(.sticky-section)');
+    const cardsSection = document.querySelector('.cards-section');
+    const navProgressFill = document.querySelector('#navProgressFill');
+    const navLinks = document.querySelectorAll('.nav-links a[data-section]');
+
+    function getPageById(id) {
+      if (id === 'intro') {
+        return {
+          id: 'intro',
+          section: heroSection,
+          progress: 0
+        };
+      }
+
+      if (id === 'slogan') {
+        return {
+          id: 'slogan',
+          section: heroSection,
+          progress: 0.76
+        };
+      }
+
+      if (id === 'case-study') {
+        const section = document.getElementById(id);
+        return section ? {
+          id: section.id,
+          section,
+          progress: 0.07
+        } : null;
+      }
+
+      const section = document.getElementById(id);
+      return section ? {
+        id: section.id,
+        section,
+        progress: id === 'projects' ? 0 : 0.5
+      } : null;
+    }
+
+    function getCaseStudySmallPages() {
+      if (!stickySection) return [];
+
+      const intentEnd = 0.16;
+      const feedbackStart = intentEnd + (1 - intentEnd) * (3.82 / 8);
+      const feedbackEnd = intentEnd + (1 - intentEnd) * (5.38 / 8);
+      const postFeedbackSlideDuration = (1 - feedbackEnd) / 3;
+      const finalProductStart = feedbackEnd;
+      const impactStart = feedbackEnd + postFeedbackSlideDuration;
+      const reflectionStart = feedbackEnd + postFeedbackSlideDuration * 2;
+      const moveDuration = feedbackStart - intentEnd;
+
+      return [
+        { id: 'case-study-intent', section: stickySection, progress: 0.07 },
+        { id: 'case-study-research', section: stickySection, progress: intentEnd + moveDuration * 0.14 },
+        { id: 'case-study-ideation', section: stickySection, progress: intentEnd + moveDuration * 0.38 },
+        { id: 'case-study-prototype', section: stickySection, progress: intentEnd + moveDuration * 0.62 },
+        { id: 'case-study-testing', section: stickySection, progress: intentEnd + moveDuration * 0.86 },
+        { id: 'case-study-feedback', section: stickySection, progress: feedbackStart + 0.045 },
+        { id: 'case-study-final-product', section: stickySection, progress: finalProductStart + postFeedbackSlideDuration * 0.36 },
+        { id: 'case-study-impact', section: stickySection, progress: impactStart + 0.002 },
+        { id: 'case-study-reflection', section: stickySection, progress: reflectionStart + postFeedbackSlideDuration * 0.58 }
+      ];
+    }
+
+    function getMotionPages() {
+      const projectsSection = document.getElementById('case-study-projects');
+
+      return [
+        getPageById('intro'),
+        getPageById('slogan'),
+        getPageById('statement'),
+        ...getCaseStudySmallPages(),
+        projectsSection ? { id: 'case-study-projects', section: projectsSection, progress: 0.5 } : null,
+        getPageById('contact')
+      ].filter(Boolean);
+    }
+
+    const navSections = Array.from(navLinks)
+      .map((link) => getPageById(link.dataset.section))
+      .filter(Boolean);
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function smootherstep(t) {
+      t = clamp(t, 0, 1);
+      return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    function softStart(t) {
+      t = clamp(t, 0, 1);
+      return 1 - Math.pow(1 - t, 2.2);
+    }
+
+    function getSectionTargetY(section) {
+      if (!section) return 0;
+
+      if (section.section) {
+        const page = section;
+        const baseSection = page.section;
+        if (!baseSection) return 0;
+        const scrollable = Math.max(0, baseSection.offsetHeight - window.innerHeight);
+        const pageProgress = page.progress ?? (baseSection.classList.contains('hero') ? 0 : 0.5);
+        return Math.max(0, baseSection.offsetTop + scrollable * pageProgress);
+      }
+
+      if (section.classList.contains('hero')) {
+        return 0;
+      }
+
+      const scrollable = Math.max(0, section.offsetHeight - window.innerHeight);
+      const centreProgress = 0.5;
+      return Math.max(0, section.offsetTop + scrollable * centreProgress);
+    }
+
+    function scrollToSection(section, smooth = true) {
+      const targetY = getSectionTargetY(section);
+      window.scrollTo({
+        top: targetY,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
+
+    function getSectionProgress(section) {
+      if (!section) return null;
+      const rect = section.getBoundingClientRect();
+      const total = section.offsetHeight - window.innerHeight;
+      if (total <= 0) return null;
+
+      const isActive = rect.top <= window.innerHeight * 0.5 && rect.bottom >= window.innerHeight * 0.5;
+      if (!isActive) return null;
+
+      return clamp(-rect.top / total, 0, 1);
+    }
+
+    function getActiveMotionPage(heroProgress = null) {
+      const viewportHeight = window.innerHeight;
+      const enterBuffer = 8;
+      const exitBuffer = 8;
+
+      function activeStickyProgress(section) {
+        if (!section) return null;
+        const rect = section.getBoundingClientRect();
+        const total = section.offsetHeight - viewportHeight;
+        if (total <= 0) return null;
+
+        const isInsideOwnStickyWindow = rect.top <= enterBuffer && rect.bottom >= viewportHeight - exitBuffer;
+        if (!isInsideOwnStickyWindow) return null;
+
+        return clamp(-rect.top / total, 0, 1);
+      }
+
+      const heroActiveProgress = activeStickyProgress(heroSection);
+      if (heroActiveProgress !== null) {
+        return {
+          type: 'hero',
+          progress: clamp(heroProgress ?? heroActiveProgress, 0, 1)
+        };
+      }
+
+      const stickyProgress = activeStickyProgress(stickySection);
+      if (stickyProgress !== null) {
+        return {
+          type: 'normal',
+          progress: stickyProgress
+        };
+      }
+
+      for (const section of motionSections) {
+        const sectionProgress = activeStickyProgress(section);
+        if (sectionProgress !== null) {
+          return {
+            type: 'normal',
+            progress: sectionProgress
+          };
+        }
+      }
+
+      return null;
+    }
+
+    function updateEdgeLights(heroProgress = null) {
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const currentY = window.scrollY;
+      const nearBottomLimit = 32;
+      const pageTargets = getMotionPages()
+        .map((page) => getSectionTargetY(page))
+        .sort((a, b) => a - b);
+      const firstPageTarget = pageTargets[0] ?? 0;
+      const lastPageTarget = pageTargets[pageTargets.length - 1] ?? maxScroll;
+      const pageTolerance = 36;
+
+      const showTop = currentY > firstPageTarget + pageTolerance;
+      const showBottom = currentY < Math.min(maxScroll - nearBottomLimit, lastPageTarget - pageTolerance);
+
+      const visibleOpacity = 0.5;
+
+      if (bottomEdgeLight) {
+        bottomEdgeLight.style.opacity = showBottom ? `${visibleOpacity}` : '0';
+        bottomEdgeLight.style.transform = showBottom
+          ? 'translateX(-50%) translateY(0) scaleX(1)'
+          : 'translateX(-50%) translateY(10px) scaleX(0.82)';
+        bottomEdgeLight.style.filter = 'blur(0.1px)';
+        bottomEdgeLight.style.pointerEvents = showBottom ? 'auto' : 'none';
+      }
+
+      if (topEdgeLight) {
+        topEdgeLight.style.opacity = showTop ? `${visibleOpacity}` : '0';
+        topEdgeLight.style.transform = showTop
+          ? 'translateX(-50%) translateY(0) scaleX(1)'
+          : 'translateX(-50%) translateY(-10px) scaleX(0.82)';
+        topEdgeLight.style.filter = 'blur(0.1px)';
+        topEdgeLight.style.pointerEvents = showTop ? 'auto' : 'none';
+      }
+    }
+
+    function scrollToSectionByDirection(direction) {
+      const sections = getMotionPages();
+
+      function scrollToPage(section) {
+        scrollToSection(section, true);
+      }
+
+      const currentY = window.scrollY;
+      const tolerance = 18;
+      const sectionTargets = sections.map((section) => ({
+        section,
+        targetY: getSectionTargetY(section)
+      }));
+
+      if (direction === 'next') {
+        const nextTarget = sectionTargets.find((item) => item.targetY > currentY + tolerance);
+        if (nextTarget) {
+          scrollToPage(nextTarget.section);
+        }
+      }
+
+      if (direction === 'prev') {
+        const previousTarget = [...sectionTargets].reverse().find((item) => item.targetY < currentY - tolerance);
+        if (previousTarget) {
+          scrollToPage(previousTarget.section);
+        }
+      }
+    }
+
+    if (bottomEdgeLight) {
+      bottomEdgeLight.addEventListener('click', () => {
+        scrollToSectionByDirection('next');
+      });
+    }
+
+    if (topEdgeLight) {
+      topEdgeLight.addEventListener('click', () => {
+        scrollToSectionByDirection('prev');
+      });
+    }
+
+    navLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const targetSection = getPageById(link.dataset.section);
+        if (!targetSection) return;
+
+        event.preventDefault();
+        scrollToSection(targetSection, true);
+        history.replaceState(null, '', `#${link.dataset.section}`);
+      });
+    });
+
+    function updateNavProgress() {
+      let holdProgress = 0;
+      let holdVisible = false;
+      let activeSectionId = navSections[0]?.id;
+      const anchorLine = window.innerHeight * 0.38;
+      const heroScrollable = heroSection ? Math.max(0, heroSection.offsetHeight - window.innerHeight) : 0;
+      const heroProgress = heroSection && heroScrollable > 0
+        ? clamp((window.scrollY - heroSection.offsetTop) / heroScrollable, 0, 1)
+        : 0;
+
+      function getHoldState(rawProgress, holdStart = 0.62, holdEnd = 0.9) {
+        const isInsideHold = rawProgress >= holdStart && rawProgress <= holdEnd;
+        return {
+          progress: isInsideHold ? clamp((rawProgress - holdStart) / (holdEnd - holdStart), 0, 1) : 0,
+          visible: isInsideHold
+        };
+      }
+
+      function applyHoldState(state) {
+        holdProgress = state.progress;
+        holdVisible = state.visible;
+      }
+
+      if (heroSection && window.scrollY < heroSection.offsetTop + heroScrollable) {
+        if (heroProgress < 0.18) {
+          activeSectionId = 'intro';
+          const introRawProgress = clamp(heroProgress / 0.18, 0, 1);
+          applyHoldState(getHoldState(introRawProgress, 0.68, 0.92));
+        } else {
+          activeSectionId = 'slogan';
+          const sloganRawProgress = clamp((heroProgress - 0.18) / 0.82, 0, 1);
+          applyHoldState(getHoldState(sloganRawProgress, 0.74, 0.94));
+        }
+
+        if (cardsSection) {
+          const statementRect = cardsSection.getBoundingClientRect();
+          if (statementRect.top <= anchorLine && statementRect.bottom > anchorLine) {
+            activeSectionId = 'statement';
+            const statementTotal = Math.max(0, cardsSection.offsetHeight - window.innerHeight);
+            const statementRawProgress = statementTotal > 0 ? clamp(-statementRect.top / statementTotal, 0, 1) : 0;
+            applyHoldState(getHoldState(statementRawProgress, 0.64, 0.9));
+          }
+        }
+      } else {
+        const caseStudyProjectsSection = document.getElementById('case-study-projects');
+
+        if (caseStudyProjectsSection) {
+          const projectsRect = caseStudyProjectsSection.getBoundingClientRect();
+
+          if (projectsRect.top <= anchorLine && projectsRect.bottom > anchorLine) {
+            activeSectionId = 'case-study';
+            applyHoldState({ progress: 0, visible: false });
+          }
+        }
+
+        navSections.forEach((page) => {
+          if (!page.section || page.section === heroSection) return;
+
+          const rect = page.section.getBoundingClientRect();
+          if (rect.top <= anchorLine && rect.bottom > anchorLine) {
+            if (activeSectionId === 'case-study' && page.id !== 'case-study') return;
+            activeSectionId = page.id;
+            const total = Math.max(0, page.section.offsetHeight - window.innerHeight);
+            const rawPageProgress = total > 0 ? clamp(-rect.top / total, 0, 1) : 0;
+
+            if (page.id === 'case-study') {
+              const intentEnd = 0.16;
+              const feedbackStart = intentEnd + (1 - intentEnd) * (3.82 / 8);
+              const feedbackEnd = intentEnd + (1 - intentEnd) * (5.38 / 8);
+              const postFeedbackSlideDuration = (1 - feedbackEnd) / 3;
+              const slideRanges = [
+                [0, intentEnd],
+                [intentEnd, intentEnd + (feedbackStart - intentEnd) * 0.25],
+                [intentEnd + (feedbackStart - intentEnd) * 0.25, intentEnd + (feedbackStart - intentEnd) * 0.5],
+                [intentEnd + (feedbackStart - intentEnd) * 0.5, intentEnd + (feedbackStart - intentEnd) * 0.75],
+                [intentEnd + (feedbackStart - intentEnd) * 0.75, feedbackStart],
+                [feedbackStart, feedbackEnd],
+                [feedbackEnd, feedbackEnd + postFeedbackSlideDuration],
+                [feedbackEnd + postFeedbackSlideDuration, 1]
+              ];
+
+              let activeCaseSlideIndex = slideRanges.findIndex(([start, end], index) => {
+                const isLast = index === slideRanges.length - 1;
+                return rawPageProgress >= start && (rawPageProgress < end || isLast);
+              });
+
+              if (activeCaseSlideIndex < 0) activeCaseSlideIndex = 0;
+
+              const [slideStart, slideEnd] = slideRanges[activeCaseSlideIndex];
+              const slideDuration = Math.max(0.001, slideEnd - slideStart);
+              const localSlideProgress = clamp((rawPageProgress - slideStart) / slideDuration, 0, 1);
+              const isFeedbackProgressSlide = activeCaseSlideIndex === 5;
+              const goldLineDelay = activeCaseSlideIndex === 2
+                ? 0.32
+                : activeCaseSlideIndex === 3
+                  ? 0.34
+                  : activeCaseSlideIndex === 4
+                    ? 0.32
+                  : isFeedbackProgressSlide
+                    ? 0.24
+                    : activeCaseSlideIndex === 1
+                        ? 0.18
+                        : activeCaseSlideIndex === 7
+                          ? 0.06
+                          : 0;
+              const goldLineEndHold = activeCaseSlideIndex === 7 ? 0.98 : isFeedbackProgressSlide ? 0.84 : 0.94;
+              const slideProgress = clamp((localSlideProgress - goldLineDelay) / Math.max(0.001, goldLineEndHold - goldLineDelay), 0, 1);
+
+              applyHoldState({
+                progress: smootherstep(slideProgress),
+                visible: localSlideProgress >= goldLineDelay && localSlideProgress <= goldLineEndHold
+              });
+            } else if (page.id === 'contact') {
+              applyHoldState({ progress: 0, visible: false });
+            } else {
+              applyHoldState(getHoldState(rawPageProgress, 0.64, 0.9));
+            }
+          }
+        });
+      }
+
+      if (navProgressFill) {
+        navProgressFill.style.transform = `scaleX(${holdProgress})`;
+        navProgressFill.style.opacity = holdVisible ? '1' : '0';
+      }
+
+      navLinks.forEach((link) => {
+        link.classList.toggle('active', link.dataset.section === activeSectionId);
+      });
+    }
+
+    function updateSectionMotion() {
+      motionSections.forEach((section) => {
+        const motionContent = section.querySelector('.section-motion-content');
+        if (!motionContent) return;
+
+        const rect = section.getBoundingClientRect();
+        const total = section.offsetHeight - window.innerHeight;
+        const progress = total > 0 ? clamp(-rect.top / total, 0, 1) : 0;
+
+        const isCardsSection = section.classList.contains('cards-section');
+        const isProjectsSection = section.classList.contains('projects-section');
+        const isGallerySection = section.classList.contains('gallery-section');
+        const isEndSection = section.classList.contains('end-section');
+
+        if (isProjectsSection || isEndSection) {
+          motionContent.style.transform = 'none';
+          motionContent.style.opacity = '1';
+          return;
+        }
+
+        let enterEnd = 0.38;
+        let exitStart = 0.76;
+        let exitLength = 0.24;
+        let startOpacity = 0.2;
+        let enterMoveAmount = 92;
+        let holdMoveAmount = -26;
+        let exitMoveAmount = 48;
+        let baseScale = 0.94;
+        let holdScaleAmount = 0.01;
+        let exitOpacityDrop = 0.28;
+
+        if (isCardsSection) {
+          enterEnd = 0.34;
+          exitStart = 0.82;
+          exitLength = 0.18;
+          startOpacity = 0.42;
+          enterMoveAmount = 82;
+          holdMoveAmount = -8;
+          exitMoveAmount = 24;
+          baseScale = 0.955;
+          holdScaleAmount = 0.003;
+          exitOpacityDrop = 0.16;
+        }
+
+        if (isGallerySection || isEndSection) {
+          enterEnd = 0.4;
+          exitStart = 0.78;
+          exitLength = 0.22;
+          startOpacity = 0.24;
+          enterMoveAmount = 96;
+          holdMoveAmount = -22;
+          exitMoveAmount = 42;
+          baseScale = 0.94;
+          holdScaleAmount = 0.008;
+          exitOpacityDrop = 0.24;
+        }
+
+        const enter = softStart(progress / enterEnd);
+        const exit = smootherstep((progress - exitStart) / exitLength);
+        const holdStart = enterEnd;
+        const holdEnd = exitStart;
+        const holdProgress = holdEnd > holdStart ? smootherstep((progress - holdStart) / (holdEnd - holdStart)) : 0;
+
+        const y = enterMoveAmount * (1 - enter) + holdMoveAmount * holdProgress - exitMoveAmount * exit;
+        const scale = baseScale + enter * (1 - baseScale) + holdScaleAmount * holdProgress - exit * 0.014;
+        const opacity = startOpacity + enter * (1 - startOpacity) - exit * exitOpacityDrop;
+
+        motionContent.style.transform = `translateY(${y}px) scale(${scale})`;
+        motionContent.style.opacity = opacity;
+      });
+    }
 
     window.addEventListener('scroll', () => {
       const scrollY = window.scrollY;
+      updateSectionMotion();
+      updateNavProgress();
 
-      // Hero object scroll animation
-      if (heroObject) {
-        const scale = 1 + Math.min(scrollY / 2600, 0.18);
-        const fade = 1 - Math.min(scrollY / 950, 0.55);
-        heroObject.style.transform = `scale(${scale}) translateY(${Math.min(scrollY / 14, 46)}px)`;
-        heroObject.style.opacity = fade;
+      if (orbLayer) {
+        targetOrbY = -scrollY * 0.48;
+        if (!orbAnimationFrame) {
+          orbAnimationFrame = requestAnimationFrame(animateOrbLayer);
+        }
       }
 
-      // Sticky section animation progress: 0 to 1
-      if (stickySection && stickyVisual) {
+      if (introStars) {
+        const introFade = 1 - smootherstep(Math.min(Math.max((scrollY - window.innerHeight * 0.36) / (window.innerHeight * 0.85), 0), 1));
+        const flyProgress = smootherstep(Math.min(Math.max(scrollY / (window.innerHeight * 0.34), 0), 1));
+        introStars.classList.toggle('visible', introFade > 0.04);
+        introStars.style.opacity = `${introFade * 0.8}`;
+
+        introStarParticles.forEach((star, index) => {
+          const flyX = Number(star.dataset.flyX || 0);
+          const flyY = Number(star.dataset.flyY || 0);
+          const stagger = (index % 17) * 0.006;
+          const localFly = smootherstep(clamp((flyProgress - stagger) / 0.88, 0, 1));
+          const floatX = Number(star.dataset.floatX || 4);
+          const floatY = Number(star.dataset.floatY || 3);
+          const speedX = Number(star.dataset.floatSpeedX || 0.8);
+          const speedY = Number(star.dataset.floatSpeedY || 0.7);
+          const phase = Number(star.dataset.floatPhase || 0);
+          const time = performance.now() * 0.001;
+          const moveX = Math.sin(time * speedX + phase) * floatX;
+          const moveY = Math.cos(time * speedY + phase + index * 0.11) * floatY;
+          const drift = Math.sin(scrollY * 0.002 + index) * 4;
+          const scale = 1 + localFly * 1.2;
+          const opacityDrop = 1 - localFly;
+
+          star.style.transform = `translate3d(${flyX * localFly + drift + moveX}px, ${flyY * localFly - scrollY * 0.035 + moveY}px, 0) scale(${scale})`;
+          star.style.setProperty('--star-opacity', `${Number(star.dataset.twinkle || 1) * opacityDrop}`);
+        });
+
+        if (!starFloatAnimationFrame && introFade > 0.04) {
+          starFloatAnimationFrame = requestAnimationFrame(animateStarFloat);
+        }
+      }
+
+      // Hero video-like scroll animation:
+      // The hero stays fixed like one scene. The title shrinks upward and the image grows into the centre.
+      let heroProgress = 0;
+      if (heroSection) {
+        const heroRect = heroSection.getBoundingClientRect();
+        const heroScrollable = heroSection.offsetHeight - window.innerHeight;
+        heroProgress = Math.min(Math.max(-heroRect.top / heroScrollable, 0), 1);
+      }
+      updateEdgeLights(heroProgress);
+
+      const heroHoldProgress = smootherstep(Math.min(Math.max((heroProgress - 0.32) / 0.58, 0), 1));
+      const heroExitProgress = Math.min(Math.max((heroProgress - 0.82) / 0.18, 0), 1);
+      const heroExitEase = smootherstep(heroExitProgress);
+      const heroExitOpacity = 1;
+      const heroExitMove = -36 * heroExitEase;
+
+      if (heroBadge) {
+        const badgeMoveProgress = smootherstep(Math.min(heroProgress / 0.58, 1));
+        const badgeScaleProgress = smootherstep(Math.min(heroProgress / 0.34, 1));
+        const badgeFadeProgress = smootherstep(Math.min(Math.max((heroProgress - 0.1) / 0.34, 0), 1));
+        const badgeBlurProgress = smootherstep(Math.min(Math.max((heroProgress - 0.1) / 0.34, 0), 1));
+        const badgeMove = -520 * badgeMoveProgress + heroExitMove;
+        const badgeScale = 1.18 - 0.46 * badgeScaleProgress;
+        const badgeOpacity = 1 - badgeFadeProgress;
+        const badgeTransform = `translateY(${badgeMove}px) scale(calc(${badgeScale} * var(--badge-pop-scale, 1) * var(--badge-soft-stretch, 1))) scaleX(var(--badge-pop-x, 1)) scaleY(var(--badge-pop-y, 1))`;
+
+        heroBadge.style.transform = badgeTransform;
+        heroBadge.style.setProperty('--badge-current-transform', badgeTransform);
+        heroBadge.style.opacity = `${badgeOpacity}`;
+        heroBadge.style.filter = `blur(${badgeBlurProgress * 18}px) saturate(${100 - badgeBlurProgress * 18}%)`;
+        heroBadge.style.webkitFilter = `blur(${badgeBlurProgress * 18}px) saturate(${100 - badgeBlurProgress * 18}%)`;
+        heroBadge.style.padding = `${28 - badgeScaleProgress * 17}px ${58 - badgeScaleProgress * 38}px`;
+        heroBadge.style.fontSize = `clamp(${30 - badgeScaleProgress * 17}px, ${3.25 - badgeScaleProgress * 1.95}vw, ${48 - badgeScaleProgress * 35}px)`;
+        heroBadge.style.setProperty('--badge-ring-opacity', `${1 - badgeFadeProgress}`);
+        heroBadge.style.setProperty('--badge-glow-opacity', `${1 - badgeFadeProgress}`);
+      }
+
+      if (sloganBadge) {
+        const sloganMoveProgress = smootherstep(Math.min(Math.max((heroProgress - 0.12) / 0.58, 0), 1));
+        const sloganScaleProgress = smootherstep(Math.min(Math.max((heroProgress - 0.12) / 0.36, 0), 1));
+        const sloganFadeProgress = smootherstep(Math.min(Math.max((heroProgress - 0.1) / 0.32, 0), 1));
+        const sloganFadeOutProgress = 0;
+        const sloganMove = -560 + 390 * sloganMoveProgress + heroExitMove;
+        const sloganScale = 0.46 + 0.2 * sloganScaleProgress;
+        const sloganOpacity = sloganFadeProgress * (1 - sloganFadeOutProgress);
+        const sloganTransform = `translate3d(-50%, calc(-50% + ${sloganMove}px), 0) scale(${sloganScale})`;
+
+        const sloganBlurProgress = smootherstep(Math.min(Math.max((heroProgress - 0.16) / 0.46, 0), 1));
+        const sloganBlur = 22 * (1 - sloganBlurProgress) + sloganFadeOutProgress * 10;
+
+        sloganBadge.style.transform = sloganTransform;
+        sloganBadge.style.opacity = `${sloganOpacity}`;
+        sloganBadge.style.filter = `blur(${sloganBlur}px) saturate(${85 + sloganBlurProgress * 15}%)`;
+        sloganBadge.style.padding = `${7 + sloganScaleProgress * 7}px ${13 + sloganScaleProgress * 16}px`;
+        sloganBadge.style.fontSize = `clamp(${10 + sloganScaleProgress * 5}px, ${0.9 + sloganScaleProgress * 0.55}vw, ${10 + sloganScaleProgress * 10}px)`;
+        sloganBadge.style.setProperty('--badge-ring-opacity', '0');
+        sloganBadge.style.setProperty('--badge-glow-opacity', '0');
+        sloganBadge.style.webkitFilter = `blur(${sloganBlur}px) saturate(${85 + sloganBlurProgress * 15}%)`;
+      }
+
+      if (navPortfolioLabel) {
+        const badgeHasFlownAway = heroProgress > 0.62;
+        const nextSection = cardsSection;
+        const nextSectionTriggered = nextSection && nextSection.getBoundingClientRect().top < window.innerHeight * 0.62;
+
+        if (badgeHasFlownAway || nextSectionTriggered) {
+          navPortfolioLabel.classList.add('visible');
+        } else {
+          navPortfolioLabel.classList.remove('visible');
+        }
+      }
+
+      if (heroTitle) {
+        const sloganEnter = smootherstep(Math.min(Math.max((heroProgress - 0.16) / 0.46, 0), 1));
+        const sloganSettle = smootherstep(Math.min(Math.max((heroProgress - 0.58) / 0.24, 0), 1));
+        const sloganFadeOutProgress = 0;
+        const titleHoldDrift = 0;
+        const titleScale = 0.82 + sloganEnter * 0.1 - sloganSettle * 0.05;
+        const titleMove = -100 + 88 * sloganEnter + titleHoldDrift + heroExitMove;
+
+        heroTitle.style.transform = `translate3d(-50%, calc(-50% + ${titleMove}px), 0) scale(${titleScale})`;
+        heroTitle.style.opacity = `${sloganEnter * (1 - sloganFadeOutProgress)}`;
+      }
+
+      if (heroRole) {
+        const roleProgress = smootherstep(Math.min(heroProgress / 0.54, 1));
+        const roleHideForSlogan = smootherstep(Math.min(Math.max((heroProgress - 0.1) / 0.28, 0), 1));
+        const roleMove = 86 * roleProgress + heroExitMove;
+        heroRole.style.transform = `translateY(${roleMove}px) scale(${1.18 - roleProgress * 0.08})`;
+        heroRole.style.opacity = `${(1 - roleProgress * 0.62) * (1 - roleHideForSlogan)}`;
+      }
+
+      if (heroContent) {
+        heroContent.style.transform = 'none';
+      }
+
+      let gatherProgress = 0;
+      if (heroKeywords) {
+        gatherProgress = smootherstep(Math.min(Math.max((heroProgress - 0.18) / 0.58, 0), 1));
+        heroKeywords.style.opacity = gatherProgress;
+        heroKeywords.style.transform = `translate(-50%, -50%) translateY(calc(${gatherProgress * 14}vh + ${heroExitMove}px))`;
+      }
+
+      keywordChips.forEach((chip, index) => {
+        const startX = parseFloat(getComputedStyle(chip).getPropertyValue('--start-x'));
+        const startY = parseFloat(getComputedStyle(chip).getPropertyValue('--start-y'));
+        const endX = parseFloat(getComputedStyle(chip).getPropertyValue('--end-x'));
+        const endY = parseFloat(getComputedStyle(chip).getPropertyValue('--end-y'));
+        const staggerDelay = (keywordChips.length - 1 - index) * 0.105;
+        const rawChipProgress = Math.min(Math.max((gatherProgress - staggerDelay) / 0.72, 0), 1);
+        const chipProgress = smootherstep(rawChipProgress);
+        const flyOvershoot = Math.sin(chipProgress * Math.PI) * 3.2;
+        const x = startX + (endX - startX) * chipProgress + flyOvershoot;
+        const y = startY + (endY - startY) * chipProgress - Math.sin(chipProgress * Math.PI) * (5 - index * 0.45);
+        const chipScale = 0.58 + chipProgress * 0.42;
+        const chipBlur = 34 - chipProgress * 16;
+        const chipOpacity = smootherstep(Math.min(Math.max((rawChipProgress - 0.18) / 0.5, 0), 1));
+
+        chip.style.left = `${x}%`;
+        chip.style.top = `${y}%`;
+        chip.style.transform = `translate(-50%, -50%) scale(${chipScale})`;
+        chip.style.backdropFilter = `blur(${chipBlur}px)`;
+        chip.style.webkitBackdropFilter = `blur(${chipBlur}px)`;
+        chip.style.opacity = chipProgress > 0.96 ? '1' : chipOpacity;
+        chip.style.visibility = chipOpacity < 0.08 ? 'hidden' : 'visible';
+        chip.classList.toggle('visible', chipProgress > 0.82 && chipOpacity >= 0.08);
+        chip.classList.toggle('floating', chipProgress > 0.96);
+      });
+
+      // Case-study section animation progress: 0 to 1
+      if (stickySection && caseStudyCopy && caseStudyTitle && caseStudyBody && caseStudyVisualGrid) {
         const rect = stickySection.getBoundingClientRect();
         const totalScroll = stickySection.offsetHeight - window.innerHeight;
         const progress = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
 
-        const scale = 0.82 + progress * 0.38;
-        const rotate = -8 + progress * 16;
-        const radius = 36 - progress * 18;
-        const opacity = 0.55 + progress * 0.45;
+        const caseEnter = softStart(Math.min(progress / 0.16, 1));
+        const caseExit = smootherstep(Math.min(Math.max((progress - 0.92) / 0.08, 0), 1));
+        const caseTextMove = 54 * (1 - caseEnter) - 22 * progress - 72 * caseExit;
+        const caseTextOpacity = 0.22 + caseEnter * 0.78 - caseExit * 0.32;
+        const intentEnd = 0.16;
+        const feedbackStart = intentEnd + (1 - intentEnd) * (3.82 / 8);
+        const feedbackEnd = intentEnd + (1 - intentEnd) * (5.38 / 8);
+        const movesEnd = feedbackStart;
+        const isIntentSlide = progress < intentEnd;
+        const isMovesSlide = progress >= intentEnd && progress < movesEnd;
+        const isFeedbackSlide = progress >= feedbackStart && progress < feedbackEnd;
+        const intentFadeOut = smootherstep(Math.min(Math.max((progress - 0.11) / 0.05, 0), 1));
+        const movesFadeIn = smootherstep(Math.min(Math.max((progress - intentEnd) / 0.07, 0), 1));
+        const firstTransitionFade = isIntentSlide
+          ? 1 - intentFadeOut * 0.94
+          : progress < intentEnd + 0.07
+            ? 0.06 + movesFadeIn * 0.94
+            : 1;
 
-        stickyVisual.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
-        stickyVisual.style.borderRadius = `${radius}px`;
-        stickyVisual.style.opacity = opacity;
+        let feedbackTextOffset = 0;
+        if (isFeedbackSlide) {
+          const feedbackProgress = clamp((progress - feedbackStart) / (feedbackEnd - feedbackStart), 0, 1);
+          feedbackTextOffset = 58 - 300 * smootherstep(feedbackProgress);
+        }
 
-        if (progress < 0.33) {
-          stickyTitle.textContent = 'Sticky product moment';
-          stickyText.textContent = 'As you scroll through this section, the right image block scales, rotates, and changes shape. This creates an Apple-style scrolling product showcase.';
-          stickyVisual.textContent = 'Stage 1';
-        } else if (progress < 0.66) {
-          stickyTitle.textContent = 'Second scroll state';
-          stickyText.textContent = 'This middle stage can introduce another product detail, process step, or design decision.';
-          stickyVisual.textContent = 'Stage 2';
+        const postFeedbackSlideDuration = (1 - feedbackEnd) / 3;
+        const finalProductStart = feedbackEnd;
+        const impactStart = feedbackEnd + postFeedbackSlideDuration;
+        const reflectionStart = feedbackEnd + postFeedbackSlideDuration * 2;
+        const postFeedbackTransitionDuration = Math.min(0.052, postFeedbackSlideDuration * 0.56);
+        const postFeedbackFadeOutLead = Math.min(0.032, postFeedbackSlideDuration * 0.34);
+        const feedbackToFinalFadeOutStart = feedbackEnd - postFeedbackFadeOutLead;
+        const feedbackToFinalFadeOut = smootherstep((progress - feedbackToFinalFadeOutStart) / Math.max(0.001, postFeedbackFadeOutLead));
+        const feedbackToFinalFadeIn = smootherstep((progress - finalProductStart) / postFeedbackTransitionDuration);
+        const feedbackToFinalFade = progress < finalProductStart
+          ? 1 - feedbackToFinalFadeOut
+          : feedbackToFinalFadeIn;
+
+        const finalToImpactFade = progress < impactStart
+          ? 1 - smootherstep((progress - (impactStart - postFeedbackFadeOutLead)) / Math.max(0.001, postFeedbackFadeOutLead))
+          : smootherstep((progress - impactStart) / Math.max(0.001, postFeedbackTransitionDuration));
+        const impactToReflectionFade = progress < reflectionStart
+          ? 1 - smootherstep((progress - (reflectionStart - postFeedbackFadeOutLead)) / Math.max(0.001, postFeedbackFadeOutLead))
+          : smootherstep((progress - reflectionStart) / Math.max(0.001, postFeedbackTransitionDuration));
+        const postFeedbackTextFade = progress < impactStart
+          ? finalToImpactFade
+          : impactToReflectionFade;
+
+        const finalProductEnterOffset = progress >= finalProductStart
+          ? 34 * (1 - feedbackToFinalFadeIn)
+          : 0;
+        const feedbackImageFadeOut = smootherstep((progress - feedbackToFinalFadeOutStart) / postFeedbackTransitionDuration);
+        const keepFeedbackImageFading = progress >= feedbackToFinalFadeOutStart && progress < finalProductStart;
+        const postFeedbackFade = progress >= impactStart ? 1 : progress >= finalProductStart ? postFeedbackTextFade : 1;
+        const impactReflectionProgress = clamp((progress - impactStart) / Math.max(0.001, 0.88 - impactStart), 0, 1);
+        const impactReflectionTextY = -76 * impactReflectionProgress;
+
+        caseStudyCopy.style.transform = progress >= impactStart
+          ? 'translateY(0)'
+          : `translateY(${caseTextMove + feedbackTextOffset + finalProductEnterOffset}px)`;
+        caseStudyCopy.style.opacity = `${Math.max(0, caseTextOpacity * firstTransitionFade * feedbackToFinalFade * postFeedbackFade)}`;
+
+        const isPostFeedbackSlide = progress >= finalProductStart;
+
+        if (caseStudyVisualGrid) {
+          caseStudyVisualGrid.classList.toggle('intent-hidden', !(isMovesSlide || isFeedbackSlide || keepFeedbackImageFading || isPostFeedbackSlide));
+          caseStudyCopy.classList.toggle('intent-layout', isIntentSlide);
+          caseStudyCopy.classList.toggle('feedback-slide', isFeedbackSlide);
+          caseStudyCopy.classList.toggle('impact-reflection-scroll', progress >= impactStart);
+          if (isMovesSlide || isFeedbackSlide || keepFeedbackImageFading || isPostFeedbackSlide) {
+            const visualProgress = isMovesSlide
+              ? clamp((progress - intentEnd) / (movesEnd - intentEnd), 0, 1)
+              : isPostFeedbackSlide
+                ? clamp((progress - finalProductStart) / (1 - finalProductStart), 0, 1)
+                : clamp((progress - feedbackStart) / (feedbackEnd - feedbackStart), 0, 1);
+            const deckEnter = smootherstep(Math.min(visualProgress / 0.16, 1));
+
+            if (isFeedbackSlide || keepFeedbackImageFading) {
+              const feedbackSettle = smootherstep(Math.min(visualProgress / 0.18, 1));
+              caseStudyVisualGrid.style.transform = `translateY(${-42 - 8 * feedbackSettle}px) scale(1) rotateZ(0deg)`;
+              caseStudyVisualGrid.style.opacity = (0.18 + deckEnter * 0.82 - caseExit * 0.24) * (1 - feedbackImageFadeOut);
+            } else if (isPostFeedbackSlide) {
+              caseStudyVisualGrid.style.transform = progress >= impactStart
+                ? 'translateY(0px) scale(1) rotateZ(0deg)'
+                : `translateY(${-40 + 22 * (1 - deckEnter)}px) scale(${0.97 + deckEnter * 0.03}) rotateZ(0deg)`;
+
+              caseStudyVisualGrid.style.opacity = (0.16 + deckEnter * 0.84 - caseExit * 0.24) * (progress >= impactStart ? 1 : postFeedbackTextFade);
+            } else {
+              caseStudyVisualGrid.style.transform = `translateY(${26 * (1 - deckEnter) - 18 * visualProgress}px) scale(${0.96 + deckEnter * 0.04}) rotateZ(${-1.5 + deckEnter * 1.5}deg)`;
+              caseStudyVisualGrid.style.opacity = 0.18 + deckEnter * 0.82 - caseExit * 0.24;
+            }
+          }
+        }
+
+        if (caseStudyIntentBadge) {
+          const intentBadgeIn = smootherstep(Math.min(progress / 0.1, 1));
+          const intentBadgeOut = smootherstep(Math.min(Math.max((progress - 0.14) / 0.1, 0), 1));
+          const intentBadgeVisible = intentBadgeIn * (1 - intentBadgeOut);
+          caseStudyIntentBadge.style.opacity = `${intentBadgeVisible}`;
+          caseStudyIntentBadge.style.transform = `translateX(-50%) translateY(${-28 + intentBadgeIn * 28 - intentBadgeOut * 18}px) scale(${0.72 + intentBadgeIn * 0.28 - intentBadgeOut * 0.08})`;
+          caseStudyIntentBadge.style.filter = `blur(${20 * (1 - intentBadgeIn) + intentBadgeOut * 14}px) saturate(${85 + intentBadgeIn * 15}%)`;
+          caseStudyIntentBadge.style.webkitFilter = `blur(${20 * (1 - intentBadgeIn) + intentBadgeOut * 14}px) saturate(${85 + intentBadgeIn * 15}%)`;
+        }
+
+        if (caseStudyPosterFrame) {
+          const posterIn = smootherstep(Math.min(progress / 0.055, 1));
+          const posterOutStart = intentEnd - 0.07;
+          const posterOut = smootherstep(Math.min(Math.max((progress - posterOutStart) / 0.07, 0), 1));
+          const posterVisible = progress < intentEnd
+            ? (0.22 + posterIn * 0.78) * (1 - posterOut)
+            : 0;
+
+          caseStudyPosterFrame.style.display = progress < intentEnd ? 'block' : 'none';
+          caseStudyPosterFrame.style.opacity = `${posterVisible}`;
+          caseStudyPosterFrame.style.transform = `translateY(${30 * (1 - posterIn) - posterOut * 86}px) scale(${0.97 + posterIn * 0.03 - posterOut * 0.045})`;
+          caseStudyPosterFrame.style.filter = `blur(${10 * (1 - posterIn) + posterOut * 18}px)`;
+          caseStudyPosterFrame.style.webkitFilter = `blur(${10 * (1 - posterIn) + posterOut * 18}px)`;
+          caseStudyPosterFrame.style.pointerEvents = 'none';
+        }
+
+        if (caseStudyStickyVisual) {
+          if (progress < intentEnd) {
+            if (caseStudyEyebrow) {
+              caseStudyEyebrow.style.display = '';
+              caseStudyEyebrow.textContent = 'Intent';
+            }
+
+            caseStudyTitle.style.display = '';
+            caseStudyTitle.textContent = 'Case-Study';
+
+            caseStudyBody.innerHTML = `
+              <p>When working on this project, I first identified the target users of this product as fans of O’Sullivan and snooker fans. The main issue I considered in this project was how to transform an abstract sports story into a commemorative product that people can understand, that can be manufactured and held in the hand, and that is visible and tangible.</p>
+            `;
+
+            caseStudyVisualGrid.classList.remove('impact-reflection-grid');
+            caseStudyStickyVisual.classList.remove('impact-reflection-poster');
+            caseStudyStickyVisual.innerHTML = '<img src="moodb.png" alt="Moodboard">';
+            caseStudyStickyVisual.style.transform = 'translateY(0) scale(0.96) rotateZ(0deg)';
+            caseStudyStickyVisual.style.opacity = '0';
+            caseStudyStickyVisual.style.filter = 'blur(18px)';
+            caseStudyStickyVisual.style.borderRadius = '0px';
+            return;
+          }
+          const movesProgress = clamp((progress - intentEnd) / (movesEnd - intentEnd), 0, 1);
+          const stageCount = 4;
+          const postFeedbackStagePosition = progress >= finalProductStart
+            ? clamp((progress - finalProductStart) / postFeedbackSlideDuration, 0, 0.999)
+            : 0;
+          const stagePosition = keepFeedbackImageFading
+            ? 4
+            : progress >= finalProductStart
+              ? 5 + postFeedbackStagePosition
+              : isFeedbackSlide
+                ? 4
+                : clamp(movesProgress * stageCount, 0, stageCount - 0.0001);
+          const activeStageIndex = Math.floor(stagePosition);
+          const visualStageIndex = progress >= finalProductStart ? 5 : activeStageIndex;
+          const localStageProgress = keepFeedbackImageFading
+            ? 1
+            : isFeedbackSlide
+              ? clamp((progress - feedbackStart) / (feedbackEnd - feedbackStart), 0, 1)
+              : progress >= finalProductStart
+                ? postFeedbackStagePosition - Math.floor(postFeedbackStagePosition)
+                : stagePosition - activeStageIndex;
+          const turnEase = smootherstep(localStageProgress);
+          const deckIntro = keepFeedbackImageFading
+            ? 1
+            : isFeedbackSlide
+              ? smootherstep(Math.min((progress - feedbackStart) / 0.025, 1))
+              : progress >= intentEnd
+                ? smootherstep(Math.min((progress - intentEnd) / 0.045, 1))
+                : 0;
+          const feedbackVisualProgress = keepFeedbackImageFading
+            ? 1
+            : isFeedbackSlide
+              ? clamp((progress - feedbackStart) / (feedbackEnd - feedbackStart), 0, 1)
+              : 0;
+          const feedbackFloat = smootherstep(feedbackVisualProgress);
+
+          const stickyVisualStages = [
+            {
+              eyebrow: 'Moves (Process and Method)',
+              title: 'Defining the theme',
+              body: '<p>At the beginning of the project, I first set Ronnie O’Sullivan and snooker as the theme. Then I started thinking about which elements could be easily recognized by users. The number 147 itself represents a maximum break, but many professional players have achieved a 147. What really makes this story special is that Ronnie O’Sullivan completed the fastest 147 record in 5 minutes and 8 seconds, as well as his nickname, “The Rocket.” Therefore, I divided these three pieces of information into three chocolates: a medal-shaped 147, a rocket made from snooker balls and snooker cues arranged in a triangle-rack shape, and a timer-shaped 5:08.</p>',
+              html: '<img src="moodb.png" alt="Moodboard">',
+              label: 'Defining the theme'
+            },
+            {
+              eyebrow: 'Moves (Process and Method)',
+              title: 'Sketching and chocolate modelling',
+              body: '<p>After deciding on the three chocolates, I first drew sketches and then modelled them in Fusion 360. At this stage, I considered not only the visual effect, but more importantly whether these ideas could actually be produced. The chocolate moulds needed to be made by first 3D-printing the models and then using vacuum forming, so details that were too thin, too deep, or too complex would be lost. Based on this limitation, I simplified some decorative elements and controlled the depth of the indentations, focusing on making the key elements 147, the Rocket, and 5:08 stand out.</p>',
+              html: '<div class="case-image-stack"><img src="sketch.png" alt="Sketch"><img src="choco-mo.jpg" alt="Chocolate model"><img src="vaccum.png" alt="Vacuum forming"><img src="choco.png" alt="Chocolate prototype"></div>',
+              label: 'Sketching and chocolate modelling'
+            },
+            {
+              eyebrow: 'Moves (Process and Method)',
+              title: 'Packaging modelling',
+              body: '<p>For the packaging, I designed the gift box in the shape of a snooker table. The lid was inspired by a snooker table cleaner, because the cleaner itself is something that appears on the table, which makes the packaging look more natural. Since the packaging needed to be made by laser-cutting wooden boards, I designed the structure in Fusion 360 according to the thickness of the wood. I treated each wooden piece as a part that could be assembled. This process made me think about what the final three-dimensional assembly would look like from the perspective of flat cutting patterns, rather than simply designing the appearance freely.</p>',
+              html: '<div class="case-image-stack packaging-image-stack"><img src="box-mo.png" alt="Packaging model"><img src="brush.jpg" alt="Brush reference"><img src="box-1.png" alt="Packaging box view 1"><img src="box-2.png" alt="Packaging box view 2"></div>',
+              label: 'Packaging modelling'
+            },
+            {
+              eyebrow: 'Moves (Process and Method)',
+              title: 'Tolerance design',
+              body: '<p>When designing the slot-joint structure, I also considered manufacturing errors. At first, I was worried that if the slot dimensions were exactly the same as the digital model, the pieces might be too tight after cutting and impossible to assemble. Later, however, I learned that laser cutting itself has a kerf, meaning the laser removes part of the material along the cutting line. Because of this, I did not enlarge all the openings. The real issue appeared during glue assembly. Since the wooden boards needed to be aligned and glued by hand, even a slight misalignment in one layer could amplify an originally small error and eventually affect how well the lid fitted. Therefore, I left some tolerance when designing the joint between the lid and the body of the box. During the later assembly process, I also found that if I had not considered these errors beforehand, the lid might not have been able to close properly.</p>',
+              html: '<div class="case-image-stack tolerance-image-stack"><img src="explode-mo.png" alt="Exploded tolerance model"><img src="IMG_6460.png" alt="Tolerance detail 1"><img src="IMG_6462.png" alt="Tolerance detail 2"><img src="IMG_6463.png" alt="Tolerance detail 3"></div>',
+              label: 'Tolerance design'
+            },
+            {
+              eyebrow: 'Feedback & Iteration',
+              title: 'Feedback & Iteration',
+              body: '<p>After the design and assembly were completed, we carried out a user feedback session. The purpose was for us to observe each other’s designs and point out problems. The feedback I received focused on three areas:</p><div class="feedback-list"><div class="feedback-item"><strong>1. The engraved area was too large</strong><p>The engraving on the lid took up too much space, while the visual focus should have been on the box underneath. This made the packaging contain too much information and distracted the user’s attention.</p><p>Solution: Reduce the size of the engraved area and shift the visual focus back to the snooker table structure.</p></div><div class="feedback-item"><strong>2. The bottom structure looked fragile</strong><p>Some details at the bottom of the snooker table strengthened the feeling of a real snooker table, but in the physical model they looked relatively fragile and might be damaged during handling or transportation.</p><p>Solution: Add a clear acrylic cover to protect the fragile parts.</p></div><div class="feedback-item"><strong>3. The way the lid opened and closed was not convenient enough</strong><p>At the time, I used a rubber band to secure the lid. Although the wooden structure made it difficult to create a strong clasp, this method did affect the user’s experience of opening and closing the gift box.</p><p>Solution: Use magnetic positioning and a plastic clasp instead, making the lid-locking mechanism more practical.</p></div></div>',
+              html: '<img class="feedback-fixed-image" src="IMG_3023.JPG" alt="Feedback and iteration reference">',
+              label: 'Feedback & Iteration'
+            },
+            {
+              eyebrow: 'Solution',
+              title: 'Final Product',
+              body: '<p>The solution is a collectible chocolate gift box souvenir. It includes three symbolic pieces of chocolate, a box body shaped like a snooker table, a lid designed in the form of a snooker table brush, and a product poster for promotion. Every part of the design is intended to make people immediately recognize that the product is about Ronnie O’Sullivan and snooker.</p><p>There is also an advertising poster, which is a rendered image created in Blender. It shows a spotlight shining onto an exploded view of the chocolate gift box. This also helps users feel the atmosphere of a live match venue.</p>',
+              html: '<div class="final-product-image-pair"><img src="2018-blender-poster.png" alt="Blender advertising poster"><img src="final.png" alt="Final product"></div>',
+              label: 'Final Product'
+            },
+            {
+              eyebrow: 'Impact',
+              title: 'Impact',
+              body: '<p>In this project, my impact is mainly reflected in the design decisions I made, my consideration of whether an idea could be turned into reality, and the improvements I made after listening to user feedback. Through designing a product, I was able to tell a meaningful story and transform a memory into a good product that can be manufactured, seen, and touched. Step-by-step iteration made the product better and better.</p><p>I also learned that product design cannot rely only on ideas. During the making process, I had to solve new problems that I had not expected before, learn from those experiences, and continue improving.</p>',
+              html: '<img src="2018-blender-poster.png" alt="Blender poster preview">',
+              label: 'Impact'
+            },
+            {
+              eyebrow: 'Reflection',
+              title: 'Reflection',
+              body: '<p>I later realized that, for people who are familiar with snooker, the symbols “147,” “5:08,” and “Rocket” can quickly make them think of Ronnie O’Sullivan. However, if users do not know much about the sport, these symbols alone may not be enough for them to understand the full story behind the design.</p><p>If I had the chance to do this project again, I would carry out user feedback earlier, instead of waiting until the product was almost finished before testing it. This is because many issues, such as the engraving being too large, the opening and closing of the box feeling unnatural, and whether users could truly understand these elements, could actually have been discovered at an earlier stage. Although making changes later can still solve these problems, the structure had already been mostly fixed by then, so further modifications became much more complicated and time consuming.</p>',
+              html: '<img src="2018-blender-poster.png" alt="Blender poster preview">',
+              label: 'Reflection'
+            }
+          ];
+
+        const activeStage = stickyVisualStages[activeStageIndex] || stickyVisualStages[0];
+        const visualStage = stickyVisualStages[visualStageIndex] || activeStage;
+
+        if (progress >= impactStart) {
+          if (caseStudyEyebrow) {
+            caseStudyEyebrow.style.display = 'none';
+          }
+
+          if (caseStudyTitle) {
+            caseStudyTitle.style.display = 'none';
+          }
+
+          if (caseStudyBody) {
+            caseStudyBody.innerHTML = `
+              <div class="scroll-story-block">
+                <div class="scroll-story-eyebrow">Impact</div>
+                <h2 class="scroll-story-title">Impact</h2>
+                <p>In this project, my impact is mainly reflected in the design decisions I made, my consideration of whether an idea could be turned into reality, and the improvements I made after listening to user feedback. Through designing a product, I was able to tell a meaningful story and transform a memory into a good product that can be manufactured, seen, and touched. Step-by-step iteration made the product better and better.</p>
+                <p>I also learned that product design cannot rely only on ideas. During the making process, I had to solve new problems that I had not expected before, learn from those experiences, and continue improving.</p>
+              </div>
+
+              <div class="scroll-story-block">
+                <div class="scroll-story-eyebrow">Reflection</div>
+                <h2 class="scroll-story-title">Reflection</h2>
+                <p>I later realized that, for people who are familiar with snooker, the symbols “147,” “5:08,” and “Rocket” can quickly make them think of Ronnie O’Sullivan. However, if users do not know much about the sport, these symbols alone may not be enough for them to understand the full story behind the design.</p>
+                <p>If I had the chance to do this project again, I would carry out user feedback earlier, instead of waiting until the product was almost finished before testing it. This is because many issues, such as the engraving being too large, the opening and closing of the box feeling unnatural, and whether users could truly understand these elements, could actually have been discovered at an earlier stage. Although making changes later can still solve these problems, the structure had already been mostly fixed by then, so further modifications became much more complicated and time consuming.</p>
+              </div>
+            `;
+            caseStudyBody.style.transform = `translateY(${impactReflectionTextY}vh)`;
+          }
+
+          caseStudyVisualGrid.classList.add('impact-reflection-grid');
+          caseStudyStickyVisual.classList.add('impact-reflection-poster');
+          caseStudyStickyVisual.style.transform = 'none';
+          caseStudyStickyVisual.style.opacity = '1';
+          caseStudyStickyVisual.style.filter = 'none';
+          caseStudyStickyVisual.style.borderRadius = '0px';
+
+          if (caseStudyStickyVisual.dataset.stageIndex !== 'impact-reflection-fixed') {
+            caseStudyStickyVisual.innerHTML = '<img src="2018-blender-poster.png" alt="Blender poster preview">';
+            caseStudyStickyVisual.dataset.stageIndex = 'impact-reflection-fixed';
+          }
         } else {
-          stickyTitle.textContent = 'Final scroll state';
-          stickyText.textContent = 'The last stage can reveal the final outcome, impact, or reflection.';
-          stickyVisual.textContent = 'Stage 3';
+          caseStudyVisualGrid.classList.remove('impact-reflection-grid');
+          caseStudyStickyVisual.classList.remove('impact-reflection-poster');
+          if (caseStudyEyebrow) {
+            caseStudyEyebrow.style.display = '';
+            caseStudyEyebrow.textContent = activeStage.eyebrow || '';
+          }
+
+          if (caseStudyTitle) {
+            caseStudyTitle.style.display = '';
+            caseStudyTitle.textContent = activeStage.title || '';
+          }
+
+          if (caseStudyBody) {
+            caseStudyBody.style.transform = '';
+            caseStudyBody.innerHTML = activeStage.body || '';
+          }
+
+          if (caseStudyStickyVisual.dataset.stageIndex !== `${visualStageIndex}`) {
+            caseStudyStickyVisual.innerHTML = visualStage.html;
+            caseStudyStickyVisual.dataset.stageIndex = `${visualStageIndex}`;
+          }
+        }
+
+          const scale = (isFeedbackSlide || keepFeedbackImageFading || progress >= finalProductStart) ? 1 : 0.82 + deckIntro * 0.2 + movesProgress * 0.12;
+          const rotate = (isFeedbackSlide || keepFeedbackImageFading || progress >= finalProductStart) ? 0 : -8 + movesProgress * 16;
+          const radius = (isFeedbackSlide || keepFeedbackImageFading || progress >= finalProductStart) ? 0 : 36 - movesProgress * 18;
+          const keepPosterContinuous = progress >= impactStart;
+          const stageFadeIn = keepPosterContinuous ? 1 : smootherstep(Math.min(localStageProgress / 0.28, 1));
+          const stageFadeOut = keepPosterContinuous ? 0 : smootherstep(Math.min(Math.max((localStageProgress - 0.82) / 0.18, 0), 1));
+          const stageFade = keepPosterContinuous ? 1 : Math.max(0, Math.min(stageFadeIn, 1 - stageFadeOut));
+          const stageBlur = keepPosterContinuous ? 0 : Math.max(0, (1 - stageFadeIn) * 16 + stageFadeOut * 10);
+          caseStudyStickyVisual.style.opacity = `${stageFade}`;
+          caseStudyStickyVisual.style.filter = `blur(${stageBlur}px)`;
+          caseStudyStickyVisual.style.webkitFilter = `blur(${stageBlur}px)`;
+          caseStudyStickyVisual.style.borderRadius = radius + 'px';
+          caseStudyStickyVisual.style.transform = `scale(${scale}) rotateZ(${rotate}deg)`;
         }
       }
     });
